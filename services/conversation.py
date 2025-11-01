@@ -88,13 +88,6 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
 
     elif step == "bus_date":
         users.update_one({"phone": phone}, {"$set": {"step": "bus_offer", "data.datedepart": text}})
-        send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} ?", [
-            {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
-            {"type": "reply", "reply": {"id": "non", "title": "Non"}}
-        ])
-
-    elif step == "bus_offer":
-        users.update_one({"phone": phone}, {"$set": {"step": "bus_end", "data.isConfirmed": text}})
         offers = get_prices_with_company(departure=user['data']['depart']
                                 , destination=user['data']['arrivee']
                                 , type="bus")
@@ -102,17 +95,30 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
         # Send buttons 3 by 3
         offer_sections = [{
             "title": "Recommandés",
-            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]} {offer['price']} $"} for offer in offers ]
+            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]}  De {offer["departure_time"]} {offer['price']} $"} for offer in offers ]
         }]
         send_list_message(phone=phone
                           , header="Offres Disponibles"
                           , body="Sélectionner une offre"
                           , footer="Powered by E-Ticket"
                           , sections=offer_sections)
+
+    elif step == "bus_offer":
+        users.update_one({"phone": phone}, {"$set": {"step": "bus_end", "data.offer_chosed": text}})
+        parsed_price = text.split("_")[-1]
+        total_price = int(parsed_price) * int(user['data']['nbplace'])
+        vat_tax = total_price * 0.16
+        total_price += vat_tax
+        fees = 0.0
+        send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']}.Total {total_price} $ | Frais: {fees}$?", [
+            {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
+            {"type": "reply", "reply": {"id": "non", "title": "Non"}}
+        ])
         #send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)   
     
     elif step == "bus_end":
         users.update_one({"phone": phone}, {"$set": {"step": "menu"}})
+        
         if(text.lower() not in ["oui", "yes"]):
             send_message(phone, "Réservation annulée. Souhaitez-vous faire une autre réservation ?")
             send_buttons(phone, "Choisissez une catégorie :", [
@@ -173,13 +179,6 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
     
     elif step == "avion_date_retour":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_offer", "data.dateRetour": text}})
-        send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} en classe {user['data']['classe']} en date du {user['data']['dateDepart']} et retour le {text}?", [
-                {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
-                {"type": "reply", "reply": {"id": "non", "title": "Non"}}
-        ])
-    
-    elif step == "avion_offer":
-        users.update_one({"phone": phone}, {"$set": {"step": "avion_end", "data.isConfirmed": text}})
         offers = get_prices_with_company(departure=user['data']['depart']
                                 , destination=user['data']['arrivee']
                                 , type="avion"
@@ -187,13 +186,31 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
         # Send buttons 3 by 3
         offer_sections = [{
             "title": "Recommandés",
-            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]} {offer['price']} $"} for offer in offers ]
+            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]} De {offer["departure_time"]} à {offer["arrival_time"]} {offer['price']} $"} for offer in offers ]
         }]
         send_list_message(phone=phone
                           , header="Offres Disponibles"
                           , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
                           , footer="Powered by E-Ticket"
                           , sections=offer_sections)
+    
+    elif step == "avion_offer":
+        users.update_one({"phone": phone}, {"$set": {"step": "avion_end", "data.offer_chosed": text}})
+        parsed_price = text.split("_")[-1]
+        total_price = int(parsed_price) * int(user['data']['nbplace'])
+        vat_tax = total_price * 0.16
+        total_price += vat_tax
+        fees = 0.0
+        if user['data'].get('typebillet') == "aller_retour":
+            send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} en classe {user['data']['classe']} en date du {user['data']['dateDepart']} et retour le {user['data']['dateRetour']} pour un total de {total_price}$ | Frais: {fees} $ ?", [
+                {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
+                {"type": "reply", "reply": {"id": "non", "title": "Non"}}
+        ])
+        else:
+            send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} en classe {user['data']['classe']} en date du {user['data']['dateDepart']} pour un total de {total_price}$  | Frais: {fees}$ ?", [
+                    {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
+                    {"type": "reply", "reply": {"id": "non", "title": "Non"}}
+            ])
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers]
         #send_buttons(phone, "Quelle companie choisisez vous :", offer_buttons)
         
