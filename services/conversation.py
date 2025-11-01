@@ -1,6 +1,21 @@
 from db import users
 from services.whatsapp import send_message, send_buttons
 
+def parse_data(data: dict):
+    if data is None:
+        return {}
+    
+    if data.get("type") == "interactive":
+        phone = data["from"]
+        text = data["interactive"]["button_reply"]["id"]
+        return phone, text
+        # text message
+    phone = data["from"]
+    text = data["text"]["body"]
+    return phone, text
+    # text message
+
+
 def handle_message(phone: str, text: str):
     print(f"Handling message from {phone}: {text}")
     user = users.find_one({"phone": phone})

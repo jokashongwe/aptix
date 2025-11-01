@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from services.conversation import handle_message
+from services.conversation import handle_message, parse_data
 import os
 import logging
 from dotenv import load_dotenv
@@ -28,9 +28,9 @@ async def verify(request: Request):
 async def webhook(req: Request):
     data = await req.json()
     try:
-        print("Webhook reçu: ", data["entry"][0]["changes"][0]["value"]["messages"][0])
-        phone = data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
-        text = data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
+        field_data  = data["entry"][0]["changes"][0]["value"]["messages"][0]
+        print("Webhook reçu: ", field_data)
+        phone, text = parse_data(field_data)
         handle_message(phone, text)
     except Exception as e:
         print("Erreur webhook: ", e)
