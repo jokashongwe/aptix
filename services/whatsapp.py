@@ -42,4 +42,5 @@ def send_buttons(phone: str, body: str, buttons: list):
             "action": {"buttons": buttons}
         }
     }
-    requests.post(API_URL, headers=headers, json=payload)
+    response = requests.post(API_URL, headers=headers, json=payload)
+    print("Response buttons: ", response.json())

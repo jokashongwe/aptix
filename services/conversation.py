@@ -99,7 +99,7 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
                                 , destination=user['data']['arrivee']
                                 , type="bus")
         offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers]
-        send_buttons(phone, "Voici les offres disponibles :", offer_buttons)   
+        send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)   
     
     elif step == "bus_end":
         users.update_one({"phone": phone}, {"$set": {"step": "menu"}})
@@ -176,7 +176,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                                 , classe=user['data']['classe'])
         offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers]
         print("Offers found: ", offers)
-        send_buttons(phone, "Voici les offres disponibles :", offer_buttons)
+        send_buttons(phone, "Quelle companie choisisez vous :", offer_buttons)
         
 
     elif step == "avion_end":
