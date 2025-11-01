@@ -100,8 +100,8 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="bus")
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers]
         # Send buttons 3 by 3
-        for i in range(0, len(offers), 3):
-            batch_offers = offers[i:i+3]
+        for i in range(0, len(offers), 2):
+            batch_offers = offers[i:i+2]
             offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in batch_offers]
             send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)
         #send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)   
@@ -180,8 +180,8 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="avion"
                                 , classe=user['data']['classe'])
         # Send buttons 3 by 3
-        for i in range(0, len(offers), 3):
-            batch_offers = offers[i:i+3]
+        for i in range(0, len(offers), 2):
+            batch_offers = offers[i:i+2]
             offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in batch_offers]
             send_buttons(phone, "Quelle companie choisisez vous :", offer_buttons)
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers]
