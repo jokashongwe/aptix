@@ -18,6 +18,7 @@ def handle_message(phone: str, text: str):
     step = user["step"]
     print(f"Handling message step: {step}")
     # Gestion du menu principal
+    text = text.strip()
     if step == "menu":
         if text.lower() in ["bus", "🚌 ticket bus"]:
             users.update_one({"phone": phone}, {"$set": {"step": "bus_depart"}})
