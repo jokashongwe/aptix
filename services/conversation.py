@@ -35,7 +35,7 @@ def handle_message(phone: str, text: str):
     print(f"Handling message step: {step}")
     # Gestion du menu principal
     text = text.strip()
-    if step == "menu":
+    if step == "menu" and text.lower() in ["bus", "avion", "concert"]:
         if text.lower() in ["bus", "🚌 ticket bus"]:
             users.update_one({"phone": phone}, {"$set": {"step": "bus_depart"}})
             send_message(phone, "🚌 Très bien ! Quel est votre lieu de départ ?")
