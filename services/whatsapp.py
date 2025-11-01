@@ -20,6 +20,7 @@ def send_message(phone: str, text: str):
 
 
 def send_buttons(phone: str, body: str, buttons: list):
+    print("Envoi des boutons")
     """
     buttons = [
         {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
