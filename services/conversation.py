@@ -2,6 +2,7 @@ from db import users
 from services.whatsapp import send_message, send_buttons
 
 def handle_message(phone: str, text: str):
+    print(f"Handling message from {phone}: {text}")
     user = users.find_one({"phone": phone})
     
     if not user:
@@ -15,7 +16,7 @@ def handle_message(phone: str, text: str):
         return
 
     step = user["step"]
-
+    print(f"Handling message step: {step}")
     # Gestion du menu principal
     if step == "menu":
         if text.lower() in ["bus", "🚌 ticket bus"]:
