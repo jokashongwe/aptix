@@ -45,7 +45,7 @@ def send_buttons(phone: str, body: str, buttons: list):
     response = requests.post(API_URL, headers=headers, json=payload)
     #print("Response buttons: ", response.json())
 
-def send_list_message(phone: str, header: str, body: str, footer: str, sections: list):
+def send_list_message(phone: str, header: str, body: str, footer: str, sections: list, button_text: str="Voir les options"):
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
         "Content-Type": "application/json"
@@ -60,7 +60,7 @@ def send_list_message(phone: str, header: str, body: str, footer: str, sections:
             "body": {"text": body},
             "footer": {"text": footer},
             "action": {
-                "button": "Voir les options",
+                "button": button_text,
                 "sections": sections
             }
         }

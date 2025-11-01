@@ -191,7 +191,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
         }]
         send_list_message(phone=phone
                           , header="Offres Disponibles"
-                          , body="Sélectionner une offre"
+                          , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
                           , footer="Powered by E-Ticket"
                           , sections=offer_sections)
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers]
