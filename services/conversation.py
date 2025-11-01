@@ -63,21 +63,29 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
 
     elif step == "bus_arrivee":
         users.update_one({"phone": phone}, {"$set": {"step": "bus_nbplace", "data.arrivee": text}})
-        send_message(phone, "Pour quelle date souhaitez-vous voyager ? (ex: 2025-11-05)")
-
+        send_message(phone, "Combien de places souhaitez-vous réserver ?")
+        #Pour quelle date souhaitez-vous voyager ? (ex: 2025-11-05)
     elif step == "bus_nbplace":
         users.update_one({"phone": phone}, {"$set": {"step": "bus_date", "data.nbplace": text}})
-        send_message(phone, "Combien de places souhaitez-vous réserver ?")    
+        send_message(phone, "Pour quelle date souhaitez-vous voyager ? (ex: 2025-11-05)")    
 
-    elif step == "bus_confirm":
-        users.update_one({"phone": phone}, {"$set": {"step": "avion_date", "data.classe": text}})
+    elif step == "bus_date":
+        users.update_one({"phone": phone}, {"$set": {"step": "bus_end", "data.datedepart": text}})
         send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} ?", [
             {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
             {"type": "reply", "reply": {"id": "non", "title": "Non"}}
-        ])
-
-    elif step == "bus_date":
+        ])    
+    
+    elif step == "bus_end":
         users.update_one({"phone": phone}, {"$set": {"step": "menu"}})
+        if(text.lower() not in ["oui", "yes"]):
+            send_message(phone, "Réservation annulée. Souhaitez-vous faire une autre réservation ?")
+            send_buttons(phone, "Choisissez une catégorie :", [
+                {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
+                {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
+                {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
+            ])
+            return
         send_message(phone, f"✅ Votre demande de billet de bus de {user['data']['depart']} à {user['data']['arrivee']} pour le {user['data']['depart']} a été enregistrée.")
         # save to db tickets collection
         send_message(phone, "Souhaitez-vous faire une autre réservation ?")
@@ -95,28 +103,32 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
 
     elif step == "avion_arrivee":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_nbplace", "data.arrivee": text}})
-        send_message(phone, "Pour quelle date souhaitez-vous voyager ? (ex: 2025-11-05)")
-
+        send_message(phone, "Combien de places souhaitez-vous réserver ?")
+        # Pour quelle date souhaitez-vous voyager ? (ex: 2025-11-05)
     elif step == "avion_nbplace":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_class", "data.nbplace": text}})
-        send_message(phone, "Combien de places souhaitez-vous réserver ?")
-
-    elif step == "avion_class":
-        users.update_one({"phone": phone}, {"$set": {"step": "avion_confirm", "data.classe": text}})
         send_buttons(phone, "Quelle classe préférez-vous ?", [
             {"type": "reply", "reply": {"id": "economique", "title": "Economique"}},
             {"type": "reply", "reply": {"id": "affaires", "title": "Affaire"}}
         ])
-    
-    elif step == "avion_confirm":
-        users.update_one({"phone": phone}, {"$set": {"step": "avion_date", "data.classe": text}})
+
+    elif step == "avion_class":
+        users.update_one({"phone": phone}, {"$set": {"step": "avion_end", "data.classe": text}})
         send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} en classe {user['data']['classe']} ?", [
             {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
             {"type": "reply", "reply": {"id": "non", "title": "Non"}}
-        ])
+        ]) 
 
-    elif step == "avion_date":
+    elif step == "avion_end":
         users.update_one({"phone": phone}, {"$set": {"step": "menu"}})
+        if(text.lower() not in ["oui", "yes"]):
+            send_message(phone, "Réservation annulée. Souhaitez-vous faire une autre réservation ?")
+            send_buttons(phone, "Choisissez une catégorie :", [
+                {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
+                {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
+                {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
+            ])
+            return
         send_message(phone, f"✅ Votre demande de billet d'avion de {user['data']['depart']} à {user['data']['arrivee']} pour le {text} a été enregistrée.")
         # save to db tickets collection
         send_message(phone, "Souhaitez-vous faire une autre réservation ?")
