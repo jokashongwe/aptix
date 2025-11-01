@@ -1,5 +1,5 @@
 from db import users
-from services.whatsapp import send_message, send_buttons
+from services.whatsapp import send_message, send_buttons, send_list_message
 from datetime import date
 from services.offer import get_destinations, get_departure_locations, get_prices_with_company
 
@@ -100,11 +100,15 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="bus")
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers]
         # Send buttons 3 by 3
-        for i in range(0, len(offers), 2):
-            batch_offers = offers[i:i+2]
-            offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in batch_offers]
-            print("Offer buttons batch: ", len(offer_buttons))
-            send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)
+        offer_sections = [{
+            "title": "Recommandés",
+            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]}_{offer['price']}"} for offer in offers ]
+        }]
+        send_list_message(phone=phone
+                          , header="Offres Disponibles"
+                          , body="Sélectionner une offre"
+                          , footer="Powered by E-Ticket"
+                          , sections=offer_sections)
         #send_buttons(phone, "Quelle companie choisisez vous ?:", offer_buttons)   
     
     elif step == "bus_end":
@@ -181,11 +185,15 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="avion"
                                 , classe=user['data']['classe'])
         # Send buttons 3 by 3
-        for i in range(0, len(offers), 2):
-            batch_offers = offers[i:i+2]
-            offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in batch_offers]
-            print("Offer buttons batch: ", len(offer_buttons))
-            send_buttons(phone, "Quelle companie choisisez vous :", offer_buttons)
+        offer_sections = [{
+            "title": "Recommandés",
+            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]}_{offer['price']}"} for offer in offers ]
+        }]
+        send_list_message(phone=phone
+                          , header="Offres Disponibles"
+                          , body="Sélectionner une offre"
+                          , footer="Powered by E-Ticket"
+                          , sections=offer_sections)
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers]
         #send_buttons(phone, "Quelle companie choisisez vous :", offer_buttons)
         

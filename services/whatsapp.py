@@ -44,3 +44,26 @@ def send_buttons(phone: str, body: str, buttons: list):
     }
     response = requests.post(API_URL, headers=headers, json=payload)
     print("Response buttons: ", response.json())
+
+def send_list_message(phone: str, header: str, body: str, footer: str, sections: list):
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": phone,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "header": {"type": "text", "text": header},
+            "body": {"text": body},
+            "footer": {"text": footer},
+            "action": {
+                "button": "Voir les options",
+                "sections": sections
+            }
+        }
+    }
+    response = requests.post(API_URL, headers=headers, json=payload)
+    print("Response list message: ", response.json())
