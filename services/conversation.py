@@ -100,7 +100,7 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="bus")
         print("Offers found: ", offers)
         send_buttons(phone, "Voici les offres disponibles :", [
-            {"type": "reply", "reply": {"id": f"{offer['bus_company']}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers
+            {"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers
         ])   
     
     elif step == "bus_end":
@@ -178,7 +178,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                                 , classe=user['data']['classe'])
         print("Offers found: ", offers)
         send_buttons(phone, "Voici les offres disponibles :", [
-            {"type": "reply", "reply": {"id": f"{offer['airline']}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers
+            {"type": "reply", "reply": {"id": f"{offer['airline'].lower()}_{offer['price']}", "title": f"{offer['airline']} - {offer['price']} USD"}} for offer in offers
         ])
         
 
