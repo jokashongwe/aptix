@@ -6,10 +6,13 @@ from services.offer import get_destinations, get_departure_locations, get_prices
 def parse_data(data: dict):
     if data is None:
         return {}
-    print("data: ", data);
     if data.get("type") == "interactive":
+        sub_type  = data["interactive"]["type"]
         phone = data["from"]
-        text = data["interactive"]["button_reply"]["id"]
+        if(sub_type == "button_reply"):
+            text = data["interactive"]["button_reply"]["id"]
+        elif(sub_type == "list_reply"):
+            text = data["interactive"]["list_reply"]["id"]
         return phone, text
         # text message
     phone = data["from"]
