@@ -29,10 +29,15 @@ user_states = {}
 @app.get("/webhook")
 async def verify(request: Request):
     logging.info("Vérification du webhook")
-    params = request.query_params
-    if params.get("hub.verify_token") == VERIFY_TOKEN:
-        return int(params.get("hub.challenge"))
-    return {"error": "invalid token"}
+    try:
+        params = request.query_params
+        if params.get("hub.verify_token") == VERIFY_TOKEN:
+            return int(params.get("hub.challenge"))
+        return {"error": "invalid token"}
+    except Exception as e:
+        logging.error(f"Erreur lors de la vérification du webhook: {e}")
+        return {"error": "internal error"}
+    
 
 # -------------------------------------------------------------
 # 2️⃣ Réception des messages entrants
