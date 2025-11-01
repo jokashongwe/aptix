@@ -28,6 +28,7 @@ async def verify(request: Request):
 async def webhook(req: Request):
     data = await req.json()
     try:
+        print("Webhook reçu: ", data["entry"][0]["changes"][0]["value"]["messages"][0])
         phone = data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
         text = data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
         handle_message(phone, text)
