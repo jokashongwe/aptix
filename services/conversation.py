@@ -203,6 +203,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                 offers_by_airline[offer['airline']] = [offer]
             else:
                 offers_by_airline[offer['airline']].append(offer)
+        print("offers_by_airline: ", offers_by_airline)
         for key, offers_res in offers_by_airline.items():
             #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
             offer_sections.append({
