@@ -18,6 +18,6 @@ def get_prices_with_company(departure, destination, type: str="bus", classe: str
     projection = {"_id": 0, "bus_company": 1, "price": 1, "departure_time": 1}
     if type == "bus":
         return list(bus_options.find(query, projection))
-    query = {"departure_location": departure, "destination": destination, "classe": classe}
+    query = {"departure_location": departure, "destination": destination, "classe": classe.capitalize()}
     projection = {"_id": 0, "airline": 1, "price": 1, "departure_time": 1, "arrival_time": 1}
     return list(airplane_options.find(query, projection))

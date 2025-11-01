@@ -210,6 +210,10 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                 "title": key,
                 "rows": [{"id": f"{o['airline'].lower()}_{o['price']}", "title": f"{o['airline']} De {o['departure_time']} à {o['arrival_time']} {o['price']} $"} for o in offers_res ]
             })
+        if(len(offer_sections) == 0):
+            send_message(phone, "Désolé, aucune offre disponible pour votre itinéraire. Souhaitez-vous essayer une autre réservation ?")
+            users.update_one({"phone": phone}, {"$set": {"step": "avion_end"}})
+            return
         send_list_message(phone=phone
                           , header="Offres Disponibles"
                           , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
