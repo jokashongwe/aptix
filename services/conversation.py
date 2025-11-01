@@ -74,7 +74,9 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
     step = user["step"]
     if step == "bus_depart":
         users.update_one({"phone": phone}, {"$set": {"step": "bus_arrivee", "data.depart": text}})
-        send_message(phone, "Et votre destination ?")
+        destination_list = get_destinations(type="bus")
+        destination_buttons = [{"type": "reply", "reply": {"id": loc, "title": loc}} for loc in destination_list]
+        send_buttons(phone, "🚌 Très bien ! Quel est votre lieu de départ ?", destination_buttons)
 
     elif step == "bus_arrivee":
         users.update_one({"phone": phone}, {"$set": {"step": "bus_nbplace", "data.arrivee": text}})
@@ -114,7 +116,9 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
     step = user["step"]
     if step == "avion_depart":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_arrivee", "data.depart": text}})
-        send_message(phone, "Et votre destination ?")
+        destination_list = get_destinations(type="avion")
+        destination_buttons = [{"type": "reply", "reply": {"id": loc, "title": loc}} for loc in destination_list]
+        send_buttons(phone, "🚌 Très bien ! Quel est votre lieu de départ ?", destination_buttons)
 
     elif step == "avion_arrivee":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_nbplace", "data.arrivee": text}})
