@@ -32,5 +32,5 @@ async def webhook(req: Request):
         text = data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
         handle_message(phone, text)
     except Exception as e:
-        print("Erreur webhook:", e)
+        print("Erreur webhook: ", e)
     return {"status": "received"}
