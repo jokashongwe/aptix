@@ -102,7 +102,7 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
         # Send buttons 3 by 3
         offer_sections = [{
             "title": "Recommandés",
-            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]}_{offer['price']}"} for offer in offers ]
+            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]} {offer['price']} $"} for offer in offers ]
         }]
         send_list_message(phone=phone
                           , header="Offres Disponibles"
@@ -187,7 +187,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
         # Send buttons 3 by 3
         offer_sections = [{
             "title": "Recommandés",
-            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]}_{offer['price']}"} for offer in offers ]
+            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]} {offer['price']} $"} for offer in offers ]
         }]
         send_list_message(phone=phone
                           , header="Offres Disponibles"
