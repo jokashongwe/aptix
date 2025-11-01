@@ -6,7 +6,7 @@ from services.offer import get_destinations, get_departure_locations, get_prices
 def parse_data(data: dict):
     if data is None:
         return {}
-    
+    print("data: ", data);
     if data.get("type") == "interactive":
         phone = data["from"]
         text = data["interactive"]["button_reply"]["id"]
@@ -104,7 +104,7 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
             #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
             offer_sections.append({
                 "title": key,
-                "rows": [{"id": f"{o['bus_company'].lower()}_{o['price']}", "title": f"De {o['departure_time']} {o['price']} $"} for o in offers_res ]
+                "rows": [{"id": f"{o['bus_company'].lower()}_{o['price']}", "title": f"Depart à {o['departure_time']} {o['price']} $"} for o in offers_res ]
             })
         send_list_message(phone=phone
                           , header="Offres Disponibles"
