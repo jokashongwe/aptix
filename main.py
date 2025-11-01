@@ -66,7 +66,7 @@ async def airplane_options_endpoint(req: Request):
         "departure_time": data.get("departure_time"),
         "arrival_time": data.get("arrival_time"),
         "price": data.get("price"),
-        "classe": data.get("classe", "Economic"),
+        "classe": data.get("classe", "economic"),
         "departure_location": data.get("departure_location"),
         "destination": data.get("destination"),
         "airline_logo_url": data.get("airline_logo_url"),

@@ -1,5 +1,5 @@
 from db import users
-from services.whatsapp import send_message, send_buttons, send_list_message
+from services.whatsapp import send_message, send_buttons, send_list_message, send_image_buttons
 from datetime import date
 from services.offer import get_destinations, get_departure_locations, get_prices_with_company
 
@@ -28,11 +28,11 @@ def handle_message(phone: str, text: str):
     if not user:
         # Nouveau client
         users.insert_one({"phone": phone, "step": "menu",  "created_at": date.today().isoformat()})
-        send_buttons(phone, "Bienvenue sur *E-Ticket Bot* 🎟️\nQue souhaitez-vous acheter ?", [
+        send_image_buttons(phone=phone, body="Bienvenue sur *E-Ticket Bot* 🎟️\nQue souhaitez-vous acheter ?", buttons=[
             {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
             {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
             {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
-        ])
+        ], image_url="https://mir-s3-cdn-cf.behance.net/project_modules/1400/e87bbf68015705.5d091862704e3.png")
         return
 
     step = user["step"]
@@ -41,11 +41,11 @@ def handle_message(phone: str, text: str):
     text = text.strip()
 
     if step == "menu" and text.lower() not in ["bus", "avion", "concert"]:
-        send_buttons(phone, "Bienvenue sur *E-Ticket Bot* 🎟️\nQue souhaitez-vous acheter ?", [
+        send_image_buttons(phone=phone, body="Bienvenue sur *E-Ticket Bot* 🎟️\nQue souhaitez-vous acheter ?", buttons=[
             {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
             {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
             {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
-        ])
+        ], image_url="https://mir-s3-cdn-cf.behance.net/project_modules/1400/e87bbf68015705.5d091862704e3.png")
         return
 
     if step == "menu":
@@ -167,7 +167,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
     elif step == "avion_date":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_class", "data.dateDepart": text}})
         send_buttons(phone, "Quelle classe préférez-vous ?", [
-            {"type": "reply", "reply": {"id": "economique", "title": "Economique"}},
+            {"type": "reply", "reply": {"id": "economic", "title": "Economique"}},
             {"type": "reply", "reply": {"id": "affaires", "title": "Affaire"}}
         ])
         
@@ -203,7 +203,7 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                 offers_by_airline[offer['airline']] = [offer]
             else:
                 offers_by_airline[offer['airline']].append(offer)
-        print("offers_by_airline: ", offers_by_airline)
+        
         for key, offers_res in offers_by_airline.items():
             #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
             offer_sections.append({

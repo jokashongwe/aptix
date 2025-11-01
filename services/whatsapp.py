@@ -18,6 +18,42 @@ def send_message(phone: str, text: str):
     }
     requests.post(API_URL, headers=headers, json=data)
 
+def send_image_message(phone: str, image_url: str, caption: str = None):
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "messaging_product": "whatsapp",
+        "to": phone,
+        "type": "image",
+        "image": {
+            "link": image_url,
+            "caption": caption
+        }
+    }
+    requests.post(API_URL, headers=headers, json=data)
+
+def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": phone,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "header": {
+                "type": "image",
+                "image": {"link": image_url}
+            },
+            "body": {"text": body},
+            "action": {"buttons": buttons}
+        }
+    }
+    response = requests.post(API_URL, headers=headers, json=payload)
 
 def send_buttons(phone: str, body: str, buttons: list):
     #print("Envoi des boutons")
