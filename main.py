@@ -1,10 +1,6 @@
 from fastapi import FastAPI, Request
 import requests, os
 from dotenv import load_dotenv
-import logging
-from datetime import datetime
-from chat.utils.messaging import send_text, send_menu_buttons, send_custom_menu_buttons
-from chat.handlers.conv_handler import handle_bus_conversation, handle_avion_conversation, handle_concert_conversation
 
 load_dotenv()
 
@@ -14,12 +10,6 @@ WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
-filename = f"whatsapp_{datetime.now().strftime("%d%m%Y")}.log"
-logging.basicConfig(filename=filename, filemode='a',
-                    format="%(asctime)s, %(msecs)d %(name)s %(levelname)s: %(message)s",
-                    datefmt="%H:%M:%S",
-                    level=logging.DEBUG)
-
 # Mémoire temporaire pour stocker l'état utilisateur
 user_states = {}
 
@@ -28,16 +18,10 @@ user_states = {}
 # -------------------------------------------------------------
 @app.get("/webhook")
 async def verify(request: Request):
-    logging.info("Vérification du webhook")
-    try:
-        params = request.query_params
-        if params.get("hub.verify_token") == VERIFY_TOKEN:
-            return int(params.get("hub.challenge"))
-        return {"error": "invalid token"}
-    except Exception as e:
-        logging.error(f"Erreur lors de la vérification du webhook: {e}")
-        return {"error": "internal error"}
-    
+    params = request.query_params
+    if params.get("hub.verify_token") == VERIFY_TOKEN:
+        return int(params.get("hub.challenge"))
+    return {"error": "invalid token"}
 
 # -------------------------------------------------------------
 # 2️⃣ Réception des messages entrants
@@ -50,7 +34,7 @@ async def receive_message(request: Request):
     if "messages" in data["entry"][0]["changes"][0]["value"]:
         msg = data["entry"][0]["changes"][0]["value"]["messages"][0]
         user_id = msg["from"]
-        logging.info(f"message de {user_id}: {msg}")
+
         # Cas 1 : clic sur bouton interactif
         if msg.get("interactive"):
             choice_id = msg["interactive"]["button_reply"]["id"]
@@ -90,16 +74,7 @@ def handle_text_message(user_id: str, text: str):
 def handle_choice(user_id: str, choice_id: str):
     if choice_id == "bus":
         user_states[user_id] = {"type": "bus", "step": "depart"}
-        #send_text(user_id, "🚌 Entrez la **ville de départ** :")
-        send_custom_menu_buttons(
-            to=user_id,
-            buttons=[
-                {"id": "Kinshasa", "title": "Kinshasa"},
-                {"id": "Boma", "title": "Boma"},
-                {"id": "Matadi", "title": "Matadi"}
-            ],
-            body_text="🚌 Sélectionnez la **ville de départ** :"
-        )
+        send_text(user_id, "🚌 Entrez la **ville de départ** :")
     elif choice_id == "avion":
         user_states[user_id] = {"type": "avion", "step": "depart"}
         send_text(user_id, "✈️ Entrez la **ville de départ** :")
@@ -109,7 +84,109 @@ def handle_choice(user_id: str, choice_id: str):
     else:
         send_menu_buttons(user_id)
 
+# -------------------------------------------------------------
+# 5️⃣ Conversations par type de billet
+# -------------------------------------------------------------
+def handle_bus_conversation(user_id, text, state, step):
+    if step == "depart":
+        state["depart"] = text.title()
+        state["step"] = "destination"
+        send_text(user_id, "🚏 Entrez la **ville de destination** :")
+    elif step == "destination":
+        state["destination"] = text.title()
+        state["step"] = "date"
+        send_text(user_id, "📅 Quelle **date** souhaitez-vous voyager ? (JJ/MM/AAAA)")
+    elif step == "date":
+        state["date"] = text
+        state["step"] = "confirm"
+        send_text(user_id, f"🚌 {state['depart']} → {state['destination']} le {state['date']}.\nSouhaitez-vous confirmer et payer ? (oui / non)")
+    elif step == "confirm":
+        if "oui" in text:
+            send_text(user_id, "💳 Voici votre lien de paiement : https://paiement.exemple.com")
+        else:
+            send_text(user_id, "❌ Réservation annulée. Tapez *menu* pour recommencer.")
+            user_states[user_id] = {}
 
+def handle_avion_conversation(user_id, text, state, step):
+    if step == "depart":
+        state["depart"] = text.title()
+        state["step"] = "destination"
+        send_text(user_id, "🛫 Entrez la **ville de destination** :")
+    elif step == "destination":
+        state["destination"] = text.title()
+        state["step"] = "date"
+        send_text(user_id, "📅 Quelle **date de vol** souhaitez-vous ?")
+    elif step == "date":
+        state["date"] = text
+        state["step"] = "confirm"
+        send_text(user_id, f"✈️ Vol {state['depart']} → {state['destination']} le {state['date']}.\nSouhaitez-vous confirmer et payer ? (oui / non)")
+    elif step == "confirm":
+        if "oui" in text:
+            send_text(user_id, "💳 Voici votre lien de paiement : https://paiement.exemple.com")
+        else:
+            send_text(user_id, "❌ Réservation annulée. Tapez *menu* pour recommencer.")
+            user_states[user_id] = {}
+
+def handle_concert_conversation(user_id, text, state, step):
+    if step == "nom":
+        state["event"] = text.title()
+        state["step"] = "lieu"
+        send_text(user_id, "📍 Où aura lieu cet événement ?")
+    elif step == "lieu":
+        state["lieu"] = text.title()
+        state["step"] = "date"
+        send_text(user_id, "📅 Quelle **date** pour cet événement ?")
+    elif step == "date":
+        state["date"] = text
+        state["step"] = "confirm"
+        send_text(user_id, f"🎫 {state['event']} à {state['lieu']} le {state['date']}.\nSouhaitez-vous confirmer et payer ? (oui / non)")
+    elif step == "confirm":
+        if "oui" in text:
+            send_text(user_id, "💳 Voici votre lien de paiement : https://paiement.exemple.com")
+        else:
+            send_text(user_id, "❌ Réservation annulée. Tapez *menu* pour recommencer.")
+            user_states[user_id] = {}
+
+# -------------------------------------------------------------
+# 6️⃣ Envoi de messages vers WhatsApp Cloud API
+# -------------------------------------------------------------
+def send_text(to, text):
+    url = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "text",
+        "text": {"body": text}
+    }
+    requests.post(url, headers=headers, json=payload)
+
+def send_menu_buttons(to):
+    url = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {"text": "👋 Bonjour ! Que souhaitez-vous réserver ?"},
+            "action": {
+                "buttons": [
+                    {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
+                    {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
+                    {"type": "reply", "reply": {"id": "concert", "title": "🎵 Concert/Événement"}},
+                ]
+            }
+        }
+    }
+    requests.post(url, headers=headers, json=payload)
 
 # -------------------------------------------------------------
 # Démarrage du serveur
