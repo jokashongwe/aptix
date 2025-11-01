@@ -40,8 +40,9 @@ class AirplaneTicketOption(BaseModel):
     flight_number: str
     departure_time: str
     arrival_time: str
+    classe: Optional[str] = "Economic"
     price: float
-    origin: str
+    departure_location: str
     destination: str
     airline_logo_url: Optional[str] = None
     created_at: Optional[str] = None
@@ -50,6 +51,8 @@ class AirplaneTicketOption(BaseModel):
 class ConcertEventOption(BaseModel):
     event_name: str
     event_date: str
+    artist: Optional[str] = None
+    short_desc: Optional[str] = None
     venue: str
     price: float
     vip_available: bool

@@ -1,6 +1,7 @@
 from db import users
 from services.whatsapp import send_message, send_buttons
 from datetime import date
+from services.offer import get_destinations, get_departure_locations, get_prices_with_company
 
 def parse_data(data: dict):
     if data is None:
@@ -35,13 +36,27 @@ def handle_message(phone: str, text: str):
     print(f"Handling message step: {step}")
     # Gestion du menu principal
     text = text.strip()
-    if step == "menu" and text.lower() in ["bus", "avion", "concert"]:
+
+    if step == "menu" and text.lower() not in ["bus", "avion", "concert"]:
+        send_buttons(phone, "Bienvenue sur *E-Ticket Bot* 🎟️\nQue souhaitez-vous acheter ?", [
+            {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
+            {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
+            {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
+        ])
+        return
+
+    if step == "menu":
         if text.lower() in ["bus", "🚌 ticket bus"]:
             users.update_one({"phone": phone}, {"$set": {"step": "bus_depart"}})
-            send_message(phone, "🚌 Très bien ! Quel est votre lieu de départ ?")
+            departure_list = get_departure_locations(type="bus")
+            departure_buttons = [{"type": "reply", "reply": {"id": loc, "title": loc}} for loc in departure_list]
+            send_buttons(phone, "🚌 Très bien ! Quel est votre lieu de départ ?", departure_buttons)
+            #send_message(phone, "🚌 Très bien ! Quel est votre lieu de départ ?")
         elif text.lower() in ["avion", "✈️ billet avion"]:
             users.update_one({"phone": phone}, {"$set": {"step": "avion_depart"}})
-            send_message(phone, "✈️ Super ! Depuis quel aéroport partez-vous ?")
+            departure_list = get_departure_locations(type="avion")
+            departure_buttons = [{"type": "reply", "reply": {"id": loc, "title": loc}} for loc in departure_list]
+            send_buttons(phone, "🚌 Très bien ! Quel est votre lieu de départ ?", departure_buttons)
         elif text.lower() in ["concert", "🎤 concert"]:
             users.update_one({"phone": phone}, {"$set": {"step": "concert_nom"}})
             send_message(phone, "🎶 Quel concert ou événement souhaitez-vous réserver ?")
