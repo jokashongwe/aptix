@@ -20,7 +20,7 @@ def send_message(phone: str, text: str):
 
 
 def send_buttons(phone: str, body: str, buttons: list):
-    print("Envoi des boutons")
+    #print("Envoi des boutons")
     """
     buttons = [
         {"type": "reply", "reply": {"id": "bus", "title": "🚌 Ticket Bus"}},
@@ -43,7 +43,7 @@ def send_buttons(phone: str, body: str, buttons: list):
         }
     }
     response = requests.post(API_URL, headers=headers, json=payload)
-    print("Response buttons: ", response.json())
+    #print("Response buttons: ", response.json())
 
 def send_list_message(phone: str, header: str, body: str, footer: str, sections: list):
     headers = {

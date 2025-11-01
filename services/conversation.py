@@ -19,7 +19,7 @@ def parse_data(data: dict):
 
 
 def handle_message(phone: str, text: str):
-    print(f"Handling message from {phone}: {text}")
+    #print(f"Handling message from {phone}: {text}")
     user = users.find_one({"phone": phone})
     
     if not user:
@@ -33,7 +33,7 @@ def handle_message(phone: str, text: str):
         return
 
     step = user["step"]
-    print(f"Handling message step: {step}")
+    #print(f"Handling message step: {step}")
     # Gestion du menu principal
     text = text.strip()
 
