@@ -9,9 +9,9 @@ def parse_data(data: dict):
     if data.get("type") == "interactive":
         sub_type  = data["interactive"]["type"]
         phone = data["from"]
-        if(sub_type == "button_reply"):
+        if sub_type == "button_reply":
             text = data["interactive"]["button_reply"]["id"]
-        elif(sub_type == "list_reply"):
+        elif sub_type == "list_reply":
             text = data["interactive"]["list_reply"]["id"]
         return phone, text
         # text message
