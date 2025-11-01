@@ -93,10 +93,19 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
                                 , type="bus")
         #offer_buttons = [{"type": "reply", "reply": {"id": f"{offer['bus_company'].lower()}_{offer['price']}", "title": f"{offer['bus_company']} - {offer['price']} USD"}} for offer in offers]
         # Send buttons 3 by 3
-        offer_sections = [{
-            "title": "Recommandés",
-            "rows": [{"id": f"{offer["bus_company"].lower()}_{offer['price']}", "title": f"{offer["bus_company"]}  De {offer["departure_time"]} {offer['price']} $"} for offer in offers ]
-        }]
+        offers_by_bus_company = {}
+        offer_sections = []
+        for offer in offers:
+            if offers_by_bus_company.get(offer['bus_company']) is None:
+                offers_by_bus_company[offer['bus_company']] = [offer]
+            else:
+                offers_by_bus_company[offer['bus_company']].append(offer)
+        for key, offers_res in offers_by_bus_company.items():
+            #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
+            offer_sections.append({
+                "title": key,
+                "rows": [{"id": f"{o['bus_company'].lower()}_{o['price']}", "title": f"De {o['departure_time']} {o['price']} $"} for o in offers_res ]
+            })
         send_list_message(phone=phone
                           , header="Offres Disponibles"
                           , body="Sélectionner une offre"
@@ -183,11 +192,20 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
                                 , destination=user['data']['arrivee']
                                 , type="avion"
                                 , classe=user['data']['classe'])
-        # Send buttons 3 by 3
-        offer_sections = [{
-            "title": "Recommandés",
-            "rows": [{"id": f"{offer["airline"].lower()}_{offer['price']}", "title": f"{offer["airline"]} De {offer["departure_time"]} à {offer["arrival_time"]} {offer['price']} $"} for offer in offers ]
-        }]
+        # parse offer by airline
+        offers_by_airline = {}
+        offer_sections = []
+        for offer in offers:
+            if offers_by_airline.get(offer['airline']) is None:
+                offers_by_airline[offer['airline']] = [offer]
+            else:
+                offers_by_airline[offer['airline']].append(offer)
+        for key, offers_res in offers_by_airline.items():
+            #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
+            offer_sections.append({
+                "title": key,
+                "rows": [{"id": f"{o['airline'].lower()}_{o['price']}", "title": f"{o['airline']} De {o['departure_time']} à {o['arrival_time']} {o['price']} $"} for o in offers_res ]
+            })
         send_list_message(phone=phone
                           , header="Offres Disponibles"
                           , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
