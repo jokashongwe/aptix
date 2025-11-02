@@ -42,6 +42,9 @@ async def webhook(req: Request):
 @app.post("/busoffers")
 async def bus_options_endpoint(req: Request):
     data = await req.json()
+    apiSecret = req.headers.get("API-SECRET")
+    if apiSecret != os.getenv("API_SECRET"):
+        return {"error": "unauthorized"}, 401
     bus_options.insert_one({
         "bus_company": data.get("bus_company"),
         "departure_time": data.get("departure_time"),
@@ -60,6 +63,9 @@ async def bus_options_endpoint(req: Request):
 @app.post("/ariplaneoffers")
 async def airplane_options_endpoint(req: Request):
     data = await req.json()
+    apiSecret = req.headers.get("API-SECRET")
+    if apiSecret != os.getenv("API_SECRET"):
+        return {"error": "unauthorized"}, 401
     airplane_options.insert_one({
         "airline": data.get("airline"),
         "flight_number": data.get("flight_number"),
@@ -77,6 +83,9 @@ async def airplane_options_endpoint(req: Request):
 @app.post("/concertoffers")
 async def concert_options_endpoints(req: Request):
     data = await req.json()
+    apiSecret = req.headers.get("API-SECRET")
+    if apiSecret != os.getenv("API_SECRET"):
+        return {"error": "unauthorized"}, 401
     concert_options.insert_one({
         "event_name": data.get("event_name"),
         "event_date": data.get("event_date"),

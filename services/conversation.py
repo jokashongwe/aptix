@@ -119,7 +119,7 @@ def handle_bus_conversation(phone: str, text: str, user: dict, step: str):
         users.update_one({"phone": phone}, {"$set": {"step": "bus_end", "data.offer_chosed": text}})
         parsed_price = text.split("_")[-1]
         total_price = int(parsed_price) * int(user['data']['nbplace'])
-        vat_tax = total_price * 0.16
+        vat_tax = 0
         total_price += vat_tax
         fees = 0.0
         send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']}.Total {total_price} $ | Frais: {fees}$?", [
@@ -181,50 +181,20 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
     elif step == "avion_typebillet":
         if text.lower() in ["oui", "yes"]:
             users.update_one({"phone": phone}, {"$set": {"step": "avion_offer", "data.typebillet": "aller_simple"}})
-            send_buttons(phone, f"Confirmez vous votre réservation de {user['data']['nbplace']} places au départ de {user['data']['depart']} pour {user['data']['arrivee']} en classe {user['data']['classe']} ?", [
-                {"type": "reply", "reply": {"id": "oui", "title": "Oui"}},
-                {"type": "reply", "reply": {"id": "non", "title": "Non"}}
-            ])
+            send_avion_offers(phone, user)
             return
         users.update_one({"phone": phone}, {"$set": {"step": "avion_date_retour", "data.typebillet": "aller_retour"}})
         send_message(phone, "Pour quelle date souhaitez-vous rentrer ? (ex: 2025-11-05)")
     
     elif step == "avion_date_retour":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_offer", "data.dateRetour": text}})
-        offers = get_prices_with_company(departure=user['data']['depart']
-                                , destination=user['data']['arrivee']
-                                , type="avion"
-                                , classe=user['data']['classe'])
-        # parse offer by airline
-        offers_by_airline = {}
-        offer_sections = []
-        for offer in offers:
-            if offers_by_airline.get(offer['airline']) is None:
-                offers_by_airline[offer['airline']] = [offer]
-            else:
-                offers_by_airline[offer['airline']].append(offer)
-        
-        for key, offers_res in offers_by_airline.items():
-            #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
-            offer_sections.append({
-                "title": key,
-                "rows": [{"id": f"{o['airline'].lower()}_{o['price']}", "title": f"{o['airline']} De {o['departure_time']} à {o['arrival_time']} {o['price']} $"} for o in offers_res ]
-            })
-        if(len(offer_sections) == 0):
-            send_message(phone, "Désolé, aucune offre disponible pour votre itinéraire. Souhaitez-vous essayer une autre réservation ?")
-            users.update_one({"phone": phone}, {"$set": {"step": "avion_end"}})
-            return
-        send_list_message(phone=phone
-                          , header="Offres Disponibles"
-                          , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
-                          , footer="Powered by E-Ticket"
-                          , sections=offer_sections)
+        send_avion_offers(phone, user)
     
     elif step == "avion_offer":
         users.update_one({"phone": phone}, {"$set": {"step": "avion_end", "data.offer_chosed": text}})
         parsed_price = text.split("_")[-1]
         total_price = int(parsed_price) * int(user['data']['nbplace'])
-        vat_tax = total_price * 0.16
+        vat_tax = 0
         total_price += vat_tax
         fees = 0.0
         if user['data'].get('typebillet') == "aller_retour":
@@ -259,6 +229,36 @@ def handle_airplane_conversation(phone: str, text: str, user: dict, step: str):
             {"type": "reply", "reply": {"id": "avion", "title": "✈️ Billet Avion"}},
             {"type": "reply", "reply": {"id": "concert", "title": "🎤 Concert"}},
         ])
+
+def send_avion_offers(user, phone: str):
+    offers = get_prices_with_company(departure=user['data']['depart']
+                                , destination=user['data']['arrivee']
+                                , type="avion"
+                                , classe=user['data']['classe'])
+        # parse offer by airline
+    offers_by_airline = {}
+    offer_sections = []
+    for offer in offers:
+        if offers_by_airline.get(offer['airline']) is None:
+            offers_by_airline[offer['airline']] = [offer]
+        else:
+            offers_by_airline[offer['airline']].append(offer)
+        
+    for key, offers_res in offers_by_airline.items():
+        #offers_by_airline[key] = sorted(value, key=lambda x: x['price'])
+        offer_sections.append({
+            "title": key,
+            "rows": [{"id": f"{o['airline'].lower()}_{o['price']}", "title": f"{o['airline']} De {o['departure_time']} à {o['arrival_time']} {o['price']} $"} for o in offers_res ]
+        })
+    if(len(offer_sections) == 0):
+        send_message(phone, "Désolé, aucune offre disponible pour votre itinéraire. Souhaitez-vous essayer une autre réservation ?")
+        users.update_one({"phone": phone}, {"$set": {"step": "avion_end"}})
+        return
+    send_list_message(phone=phone
+                          , header="Offres Disponibles"
+                          , body="Choisissez parmis nos partenaires l'offre qui vous conviens le mieux"
+                          , footer="Powered by E-Ticket"
+                          , sections=offer_sections)
 
 def handle_concert_conversation(phone: str, text: str, user: dict, step: str):
     send_message(phone=phone, text="Cette option n'est pas encore dispoible")  # À implémenter de manière similaire à handle_bus_conversation
