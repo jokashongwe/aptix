@@ -105,6 +105,7 @@ def send_list_message(phone: str, header: str, body: str, footer: str, sections:
     print("Response list message: ", response.json())
 
 def send_concert_catalog(phone, catalog: str):
+    print("Envoi du catalogue des concerts: ", catalog)
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
@@ -126,10 +127,10 @@ def send_concert_catalog(phone, catalog: str):
                     {
                         "title": "Concerts à venir",
                         "product_items": [
-                            {"product_retailer_id": "concert_maajabu_vip"},
-                            {"product_retailer_id": "concert_maajabu_simple"},
-                            {"product_retailer_id": "concert_moise_mbiye_vip"},
-                            {"product_retailer_id": "concert_moise_mbiye_simple"}
+                            {"product_retailer_id": "ljg8oaeiv3"},
+                            {"product_retailer_id": "q7adhw040q"},
+                            {"product_retailer_id": "jh5t72jjk3"},
+                            {"product_retailer_id": "a4axx5iulr"}
                         ]
                     }
                 ]
