@@ -4,7 +4,6 @@ import os
 import logging
 from dotenv import load_dotenv
 from db import bus_options, airplane_options, concert_options
-from models import BusTicketOption
 from datetime import datetime
 
 load_dotenv()
