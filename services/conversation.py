@@ -1,5 +1,5 @@
 from db import users
-from services.whatsapp import send_message, send_buttons, send_list_message, send_image_buttons
+from services.whatsapp import send_message, send_buttons, send_list_message, send_image_buttons, send_concert_catalog
 from datetime import date
 from services.offer import get_destinations, get_departure_locations, get_prices_with_company
 
@@ -261,4 +261,4 @@ def send_avion_offers(user, phone: str):
                           , sections=offer_sections)
 
 def handle_concert_conversation(phone: str, text: str, user: dict, step: str):
-    send_message(phone=phone, text="Cette option n'est pas encore dispoible")  # À implémenter de manière similaire à handle_bus_conversation
+    send_concert_catalog(phone=phone, catalog="concert_catalog")  # À implémenter de manière similaire à handle_bus_conversation

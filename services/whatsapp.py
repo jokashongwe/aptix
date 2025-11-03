@@ -103,3 +103,39 @@ def send_list_message(phone: str, header: str, body: str, footer: str, sections:
     }
     response = requests.post(API_URL, headers=headers, json=payload)
     print("Response list message: ", response.json())
+
+def send_concert_catalog(phone, catalog: str):
+    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": phone,
+        "type": "interactive",
+        "interactive": {
+            "type": "product_list",
+            "header": {"type": "text", "text": "🎶 Événements disponibles"},
+            "body": {"text": "Voici les concerts et événements à venir :"},
+            "footer": {"text": "Powered by E-Ticket Bot"},
+            "action": {
+                "catalog_id": catalog,
+                "sections": [
+                    {
+                        "title": "Concerts à venir",
+                        "product_items": [
+                            {"product_retailer_id": "concert_maajabu_vip"},
+                            {"product_retailer_id": "concert_maajabu_simple"},
+                            {"product_retailer_id": "concert_moise_mbiye_vip"},
+                            {"product_retailer_id": "concert_moise_mbiye_simple"}
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    print(response.json())
