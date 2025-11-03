@@ -62,7 +62,7 @@ def handle_message(phone: str, text: str):
             send_buttons(phone, "🚌 Très bien ! Quel est votre lieu de départ ?", departure_buttons)
         elif text.lower() in ["concert", "🎤 concert"]:
             users.update_one({"phone": phone}, {"$set": {"step": "concert_nom"}})
-            send_message(phone, "🎶 Quel concert ou événement souhaitez-vous réserver ?")
+            send_concert_catalog(phone=phone, catalog="concert_catalog")
         else:
             send_message(phone, "Veuillez choisir une option valide.")
 
@@ -261,4 +261,5 @@ def send_avion_offers(user, phone: str):
                           , sections=offer_sections)
 
 def handle_concert_conversation(phone: str, text: str, user: dict, step: str):
-    send_concert_catalog(phone=phone, catalog="concert_catalog")  # À implémenter de manière similaire à handle_bus_conversation
+    send_message(phone, "Fonctionnalité de réservation de concert en cours de développement.")
+    #send_concert_catalog(phone=phone, catalog="concert_catalog")  # À implémenter de manière similaire à handle_bus_conversation
