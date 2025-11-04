@@ -3,11 +3,12 @@ from fastapi import FastAPI
 import os
 import logging
 from dotenv import load_dotenv
-from routes import ticket_router, webhook_router
+from routes import ticket_router, webhook_router, fees_router
 
 load_dotenv()
 
 app = FastAPI()
 
 app.include_router(webhook_router)
+app.include_router(fees_router)
 app.include_router(ticket_router)
