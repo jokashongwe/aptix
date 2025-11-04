@@ -47,7 +47,7 @@ def compute_commission(amount: float, commission_config: dict):
 def get_school_account(school_code: str, currency: str):
     query = {"school_code": school_code, "currency": currency}
     projection= {"_id": 0, "account_number": 1}
-    return set(accounts.find(query, projection))
+    return accounts.find_one(query, projection)
 
 def create_failed_transaction(trn_data: dict, api_error: dict):
     transactions.insert_one({**trn_data, "status": "failed", "api_response": api_error})

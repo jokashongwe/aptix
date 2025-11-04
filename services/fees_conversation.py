@@ -103,6 +103,9 @@ async def handle_fees_message(phone: str, text:str):
             ])
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
+        send_image_message(phone=phone
+                           , image_url="https://cdn-icons-png.freepik.com/256/10295/10295662.png",
+                           caption="Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
         payType = 2
         if text == "orangemoney":
             payType = 1
@@ -119,13 +122,15 @@ async def handle_fees_message(phone: str, text:str):
                            timeout=20)
         
         if not result.get("ok"):
-            create_failed_transaction(trn_data=user['data'], api_error={"detail": result.get("Message") or "Payment provider error"})
-            raise HTTPException(status_code=502, detail=result.get("Message") or "Payment provider error")
+            create_failed_transaction(trn_data=user['data'], api_error=result)
+            raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
+        account = get_school_account(school_code=user['data']['school_code'],
+                                     currency=user['data']['currency'])
+        trn_data = {user['data'] | {"account": account}}
+        create_credit_transaction(trn_data=trn_data, api_response=result)
 
         # END CALL MAXICASH
-        send_image_message(phone=phone
-                           , image_url="https://cdn-icons-png.freepik.com/256/10295/10295662.png",
-                           caption="Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
+        
 
 
 
