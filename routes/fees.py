@@ -153,6 +153,6 @@ async def get_account_details(account_number: str):
 
 
 @fees_router.post("/fees")
-def create_fee(fee_data):
+def create_fee(fee_data: dict):
     fees.insert_one(fee_data)
     return {"message": "created!"}
