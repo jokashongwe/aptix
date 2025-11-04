@@ -64,8 +64,8 @@ async def handle_fees_message(phone: str, text:str):
             "title": "Résultats",
             "rows": [{
                 "id": f"{student["student_id"]}",
-                "title":  f"{student["classroom"]}", 
-                "description": f"{student["full_name"]}"
+                "title":  f"{student["student_id"].upper()}", 
+                "description": f"{student["full_name"]} {student["classroom"]}"
             } for student in students ]
         }]
         send_list_message(phone=phone,
