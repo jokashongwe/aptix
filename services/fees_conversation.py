@@ -1,9 +1,10 @@
 from db import users
-from services.whatsapp import send_message, send_buttons, send_list_message, send_image_message, send_concert_catalog
+from services.whatsapp import send_message, send_buttons, send_list_message, send_image_message
 from datetime import date
-from services.fees import search_by_fullname, search_by_studentid, get_fees, get_fee_title, get_student_name
-from services.conversation import parse_data
+from services.fees import *
+from services.maxicash import send_payment_async
 import os
+from fastapi import HTTPException
 
 acad_year = os.getenv("SCHOOL_YEAR", "2025-2026")
 
@@ -13,7 +14,7 @@ def handle_start(phone:str):
                        , image_url="https://www.shutterstock.com/image-vector/chat-bot-icon-virtual-smart-600nw-2478937553.jpg")
     users.update_one({"phone": phone}, {"$set": {"step": "search"}})
 
-def handle_fees_message(phone: str, text:str):
+async def handle_fees_message(phone: str, text:str):
     user = users.find_one({"phone": phone})
     if not user:
         users.insert_one({"phone": phone, "step": "start",  "created_at": date.today().isoformat()})
@@ -102,7 +103,24 @@ def handle_fees_message(phone: str, text:str):
             ])
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
+        payType = 2
+        if text == "orangemoney":
+            payType = 1
+        elif text == "airtelmoney":
+            payType = 3
+        elif text == "rakkacash":
+            payType = 51
         # contact MaxiCash API
+        endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
+        endpoint = f"{endpoint}/Integration/PayNowSync"
+        result = await send_payment_async(endpoint_url=endpoint,
+                           pay_type=payType,
+                           currency_code=user["data"]['currency'],
+                           timeout=20)
+        
+        if not result.get("ok"):
+            create_failed_transaction(trn_data=user['data'], api_error={"detail": result.get("Message") or "Payment provider error"})
+            raise HTTPException(status_code=502, detail=result.get("Message") or "Payment provider error")
 
         # END CALL MAXICASH
         send_image_message(phone=phone

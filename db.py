@@ -20,6 +20,7 @@ students = db["students"]
 fees = db["school_fees"]
 semesters = db["school_semester"]
 transactions = db["transactions"]
+failed_transactions = db["failed_transactions"]
 charges = db["charges"]
 ## LATER INTEGRATION
 accounts = db["accounts"]
