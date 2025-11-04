@@ -60,7 +60,7 @@ async def handle_fees_message(phone: str, text:str):
             return
         sections = [{
             "title": "Résultats",
-            "rows": [{"id": f"{student["student_id"]}", "title": f"{student["full_name"]} {student["classe"]}"} for student in students ]
+            "rows": [{"id": f"{student["student_id"]}", "title": f"{student["full_name"]} {student["classroom"]}"} for student in students ]
         }]
         send_list_message(phone=phone, header="Resultat trouvés pour votre recherche", sections=sections)
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.school_code": text}})

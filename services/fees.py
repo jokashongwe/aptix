@@ -18,7 +18,7 @@ def get_student_name(student_id: str):
 
 def search_by_studentid(id: str, school_year: str):
     query = {"student_id": id, "academic_year": school_year}
-    projection = {"_id": 0, "student_id": 1, "full_name": 1, "classe": 1} 
+    projection = {"_id": 0, "student_id": 1, "full_name": 1, "classroom": 1} 
     return list(students.find(query, projection))
 
 def search_by_fullname(fullname: str, school_year: str):
@@ -27,7 +27,7 @@ def search_by_fullname(fullname: str, school_year: str):
     # crée une regex qui impose la présence de tous les mots, dans n’importe quel ordre
     regex = "".join(f"(?=.*\\b{re.escape(w)}\\b)" for w in words)
     pattern = re.compile(regex, re.IGNORECASE)
-    projection = {"_id": 0, "student_id": 1, "full_name": 1, "classe": 1} 
+    projection = {"_id": 0, "student_id": 1, "full_name": 1, "classroom": 1} 
     return list(students.find({"fullname": {"$regex": pattern}, "academic_year": school_year}, projection))
 
 def compute_charge(amount: float, charge_config: dict):
