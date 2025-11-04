@@ -12,3 +12,7 @@ app = FastAPI()
 app.include_router(webhook_router)
 app.include_router(fees_router)
 app.include_router(ticket_router)
+
+@app.get("/")
+async def root():
+    return {"message": "API en ligne"}

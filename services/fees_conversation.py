@@ -23,7 +23,7 @@ async def handle_fees_message(phone: str, text:str):
     current_step = user["step"]
     #options_slug = ["search", "select_student", "list_fees", "put_amount", "select_currency", "confirm", "payment_method" ,"wait_for_payment"]
     text = text.lower().strip()
-    if text in ["annuler", "quitter", "arret", "stop"]:
+    if text in ["annuler", "quitter", "arret", "stop", "quit"]:
         send_message(phone=phone, text="Merci d'avoir utiliser notre service et à bientôt")
         users.update_one({"phone": phone}, {"$set": {"step": "start"}})
         return

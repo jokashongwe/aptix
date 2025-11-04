@@ -31,7 +31,36 @@ async def list_schools(school: dict):
     """
     Créer la list
     """
-    schools.insert_one(school)
+    m_accounts = [
+        {"title": f"{school['title']} Charge Account USD", "currency": "USD", "number": f"530{school['code']}840", "school_code": f"{school['code']}"},
+        {"title": f"{school['title']} Charge Account CDF", "currency": "CDF", "number": f"530{school['code']}976", "school_code": f"{school['code']}"},
+        {"title": f"{school['title']} Commission Account USD", "currency": "USD", "number": f"510{school['code']}840", "school_code": f"{school['code']}"},
+        {"title": f"{school['title']} Commission Account CDF", "currency": "CDF", "number": f"510{school['code']}976", "school_code": f"{school['code']}"},
+        {"title": f"{school['title']} Main Account USD", "currency": "USD", "number": f"1000111{school['code']}840", "school_code": f"{school['code']}"},
+        {"title": f"{school['title']} Main Account CDF", "currency": "CDF", "number": f"1000100{school['code']}976", "school_code": f"{school['code']}"},
+    ]
+    cdf_account_number = f"1000110{school['code']}976"
+    usd_account_number = f"1000110{school['code']}840"
+    cdf_charge_account = f"510{school['code']}976"
+    usd_charge_account = f"510{school['code']}840"
+    schools.insert_one(school | {
+        "cdf_account_number": cdf_account_number,
+        "usd_account_number": usd_account_number,
+        "cdf_charge_account": cdf_charge_account,
+        "usd_charge_account": usd_charge_account,
+        "usd_commission_account": f"530{school['code']}840",
+        "cdf_commission_account": f"530{school['code']}976"
+    })
+
+    for account in m_accounts:
+        # Create all Accounts : one for CDF/USD
+        accounts.insert_one({
+            "account_number": account["number"],
+            "title": account["title"],
+            "current_balance": 0.0,
+            "currency": account["currency"]
+        })
+
     return {"schools": "Created"}
 
 @fees_router.post("/students", tags=["Fees Management"])
