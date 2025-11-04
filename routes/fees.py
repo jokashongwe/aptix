@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from db import students, transactions, accounts
+from db import students, transactions, accounts, schools
 from datetime import datetime
 import tempfile
 import pandas as pd
@@ -16,6 +16,23 @@ async def list_students(school_code: str):
     student_list = list(students.find(query, projection))
     return {"students": student_list}
 
+@fees_router.get("/schools", tags=["Fees Management"])
+async def list_schools():
+    """
+    Récupère la liste des élèves pour un code d'école donné.
+    """
+    query = {}
+    projection = {"_id": 0, "title": 1, "code": 1, "logo_url": 1}
+    school_list = list(schools.find(query, projection))
+    return {"schools": school_list}
+
+@fees_router.post("/schools", tags=["Fees Management"])
+async def list_schools(school: dict):
+    """
+    Créer la list
+    """
+    schools.insert_one(school)
+    return {"schools": "Created"}
 
 @fees_router.post("/students", tags=["Fees Management"])
 async def import_students(file: UploadFile = File(...)):
