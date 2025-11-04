@@ -58,15 +58,10 @@ async def handle_fees_message(phone: str, text:str):
                 {"type": "reply", "reply": {"id": "quitter", "title": "Annuler"}}
             ])
             return
-        sections = [{
-            "title": "Résultats",
-            "rows": [{"id": f"{student["student_id"]}", "title": f"{student["full_name"]} {student["classroom"]}"} for student in students ]
-        }]
-        send_list_message(phone=phone,
-                           header="Resultat trouvés pour votre recherche",
-                           body="Consultez la liste des résulats trouvés",
-                           footer="Powerd By SkulIA",
-                           sections=sections)
+        message = "Résultats de la recherche.\nSélectionner l'enfant pour lequel vous souhaitez payer:"
+        for index, st in enumerate(students):
+            message += f"\n{index + 1}. {st["full_name"]} {str["classroom"]}"
+        send_message(phone=phone, text=message)
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.school_code": text}})
     elif current_step.startswith("list_fees"):
         users.update_one({"phone": phone}, {"$set": {"step": "put_amount", "data.student_id": text}})
