@@ -60,7 +60,7 @@ async def handle_fees_message(phone: str, text:str):
             return
         message = "Résultats de la recherche.\nSélectionner l'enfant pour lequel vous souhaitez payer:"
         for index, st in enumerate(students):
-            message += f"\n{index + 1}. {st["full_name"]} {str["classroom"]}"
+            message += f"\n{index + 1}. {st["full_name"]} {st["classroom"]}"
         send_message(phone=phone, text=message)
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.school_code": text}})
     elif current_step.startswith("list_fees"):
