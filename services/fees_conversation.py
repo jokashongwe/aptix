@@ -46,16 +46,16 @@ async def handle_fees_message(phone: str, text:str):
     elif current_step.startswith("select_student_"):
         students = []
         field_type = "matricule"
-        if current_step == "":
-            students = search_by_studentid(id=text, school_year=acad_year)
+        if current_step == "select_student_mat":
+            students = search_by_studentid(id=text.upper(), school_year=acad_year)
         else:
-            students = search_by_fullname(fullname=text, school_year=acad_year)
+            students = search_by_fullname(fullname=text.upper(), school_year=acad_year)
             field_type = "nom"
         if not students or len(students) == 0:
             send_buttons(phone=phone, body=f"Nous n'avons trouvé aucune correspondance pour ce {field_type}.\nSouhaitez-vous reprendre la recherche par matricule ou par nom ?", buttons=[
                 {"type": "reply", "reply": {"id": "select_student_mat", "title": "Matricule"}},
                 {"type": "reply", "reply": {"id": "select_student_name", "title": "Nom de l'élève"}},
-                {"type": "reply", "reply": {"id": "quit", "title": "Annuler"}}
+                {"type": "reply", "reply": {"id": "quitter", "title": "Annuler"}}
             ])
             return
         sections = [{
