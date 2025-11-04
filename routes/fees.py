@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 from db import students, transactions, accounts, schools, fees
 from datetime import datetime
 import tempfile
@@ -153,6 +153,15 @@ async def get_account_details(account_number: str):
 
 
 @fees_router.post("/fees")
-def create_fee(fee_data: dict):
-    fees.insert_one(fee_data)
+async def create_fee(req: Request):
+    data = await req.json()
+    fees.insert_one({
+        "fee_id": data.get("fee_id"),
+        "title": data.get("title"),
+        "school_code": data.get("school_code"),
+        "price_usd": data.get("price_usd"),
+        "price_cdf": data.get("price_cdf"),
+        "academic_year": data.get("academic_year"),
+        "is_follow_rate": data.get("is_follow"),
+    })
     return {"message": "created!"}
