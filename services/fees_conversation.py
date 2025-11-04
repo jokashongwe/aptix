@@ -38,11 +38,13 @@ async def handle_fees_message(phone: str, text:str):
         ])
     elif current_step == "select_student":
         #users.update_one({"phone": phone}, {"$set": {"step": "select_student", "data.school_code": text}})
-        text_field = "nom complet"
+        text_field = "nom"
+        pp = "select_student_name"
         if text == "select_student_mat":
+            pp = "select_student_mat"
             text_field = "matricule"
         send_message(phone=phone, text=f"Quel est le {text_field} de l'élève ?")
-        users.update_one({"phone": phone}, {"$set": {"step": text}})
+        users.update_one({"phone": phone}, {"$set": {"step": pp, "data.fieldtype": text_field}})
     elif current_step.startswith("select_student_"):
         students = []
         field_type = "matricule"
@@ -71,7 +73,7 @@ async def handle_fees_message(phone: str, text:str):
                            body="Consultez la liste des résulats trouvés",
                            footer="Powerd By SkulIA",
                            sections=sections)
-        users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.school_code": text}})
+        users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.identity": text}})
     elif current_step.startswith("list_fees"):
         users.update_one({"phone": phone}, {"$set": {"step": "put_amount", "data.student_id": text}})
         fees = get_fees(school_code=user["data"]["school_code"], school_year=acad_year)
@@ -141,6 +143,8 @@ async def handle_fees_message(phone: str, text:str):
                                      currency=user['data']['currency'])
         trn_data = {user['data'] | {"account": account}}
         create_credit_transaction(trn_data=trn_data, api_response=result)
+    
+    print("User Data: ", user['data'])
 
         # END CALL MAXICASH
         
