@@ -35,7 +35,7 @@ async def webhook(req: Request):
         if CHAT_OPTION == "TICKET":
             handle_message(phone, text)
         else: 
-            handle_fees_message(phone, text)
+            await handle_fees_message(phone, text)
     except Exception as e:
         print("Erreur webhook: ", e)
     return {"status": "received"}
