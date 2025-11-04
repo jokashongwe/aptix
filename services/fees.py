@@ -3,7 +3,10 @@ import re
 from datetime import datetime
 
 def get_fees(school_code: str, school_year: str):
-    query = {"school_code": school_code, "academic_year": school_year}
+    code_s= str(school_code)
+    if len(code_s) == 3:
+        code_s = f"0{school_code}"
+    query = {"school_code": code_s, "academic_year": school_year}
     projection = {"_id": 0, "title": 1, "price_usd": 1, "price_cdf": 1, "fee_id": 1}
     return list(fees.find(query, projection))
 

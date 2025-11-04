@@ -75,7 +75,6 @@ async def handle_fees_message(phone: str, text:str):
                            sections=sections)
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.identity": text}})
     elif current_step.startswith("list_fees"):
-        users.update_one({"phone": phone}, {"$set": {"step": "put_amount", "data.student_id": text}})
         fees = get_fees(school_code=user["data"]["school_code"], school_year=acad_year)
         sections = [{
             "title": "List des Frais",
@@ -86,6 +85,7 @@ async def handle_fees_message(phone: str, text:str):
                            body="Sélectionner le frais que vous souhaitez payer",
                            footer="Powered By",
                            sections=sections)
+        users.update_one({"phone": phone}, {"$set": {"step": "put_amount", "data.student_id": text}})
     elif current_step.startswith("put_amount"):
         users.update_one({"phone": phone}, {"$set": {"step": "select_currency", "data.fee_id": text}})
         send_message(phone=phone, text="Combien souhaitez vous payer ? (Donnez juste le montant vous sélectionnerez la devise par la suite)")
