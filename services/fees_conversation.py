@@ -76,6 +76,7 @@ async def handle_fees_message(phone: str, text:str):
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.identity": text}})
     elif current_step.startswith("list_fees"):
         fees = get_fees(school_code=user["data"]["school_code"], school_year=acad_year)
+        print("Fees: ", fees)
         sections = [{
             "title": "List des Frais",
             "rows": [{"id": f"{fee["fee_id"]}", "title": f"{fee["title"]} {fee["price_cdf"]} Fc ({fee["price_usd"]}$)"} for fee in fees ]

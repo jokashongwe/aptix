@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from db import students, transactions, accounts, schools
+from db import students, transactions, accounts, schools, fees
 from datetime import datetime
 import tempfile
 import pandas as pd
@@ -150,3 +150,9 @@ async def get_account_details(account_number: str):
     if not account:
         raise HTTPException(status_code=404, detail="Compte non trouvé")
     return account
+
+
+@fees_router.post("/fees")
+def create_fee(fee_data):
+    fees.insert_one(fee_data)
+    return {"message": "created!"}
