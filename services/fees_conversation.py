@@ -62,7 +62,11 @@ async def handle_fees_message(phone: str, text:str):
             "title": "Résultats",
             "rows": [{"id": f"{student["student_id"]}", "title": f"{student["full_name"]} {student["classroom"]}"} for student in students ]
         }]
-        send_list_message(phone=phone, header="Resultat trouvés pour votre recherche", sections=sections)
+        send_list_message(phone=phone,
+                           header="Resultat trouvés pour votre recherche",
+                           body="Consultez la liste des résulats trouvés",
+                           footer="Powerd By SkulIA",
+                           sections=sections)
         users.update_one({"phone": phone}, {"$set": {"step": "list_fees", "data.school_code": text}})
     elif current_step.startswith("list_fees"):
         users.update_one({"phone": phone}, {"$set": {"step": "put_amount", "data.student_id": text}})
@@ -71,7 +75,11 @@ async def handle_fees_message(phone: str, text:str):
             "title": "List des Frais",
             "rows": [{"id": f"{fee["fee_id"]}", "title": f"{fee["title"]} {fee["price_cdf"]} Fc ({fee["price_usd"]}$)"} for fee in fees ]
         }]
-        send_list_message(phone=phone, header="Liste des Frais",body="Sélectionner le frais que vous souhaitez payer", sections=sections)
+        send_list_message(phone=phone,
+                           header="Liste des Frais",
+                           body="Sélectionner le frais que vous souhaitez payer",
+                           footer="Powered By",
+                           sections=sections)
     elif current_step.startswith("put_amount"):
         users.update_one({"phone": phone}, {"$set": {"step": "select_currency", "data.fee_id": text}})
         send_message(phone=phone, text="Combien souhaitez vous payer ? (Donnez juste le montant vous sélectionnerez la devise par la suite)")
