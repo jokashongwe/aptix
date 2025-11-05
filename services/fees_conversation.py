@@ -125,7 +125,7 @@ async def handle_fees_message(phone: str, text:str):
         endpoint = f"{endpoint}/Integration/PayNowSync"
         put_amount = float(user['data']['amount'])
         amount = put_amount * 100
-        trx_detail = {"Amount": amount,"Reference": f"TRX{phone}_3675","Telephone": phone}
+        trx_detail = {"Amount": amount,"Reference": f"TRX3675","Telephone": phone}
         result = await send_payment_async(endpoint_url=endpoint,
                                           pay_type=payType,
                                           request_data=trx_detail,

@@ -26,6 +26,7 @@ async def send_payment_async(
         "PayType": pay_type,
         "CurrencyCode": currency_code
     }
+    print("MaxiCash Payload: ", payload)
     headers = {"Content-Type": "application/json"}
 
     async with httpx.AsyncClient(timeout=timeout) as client:
