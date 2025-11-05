@@ -53,7 +53,7 @@ def get_school_account(school_code: str, currency: str):
     return accounts.find_one(query, projection)
 
 def create_failed_transaction(trn_data: dict, api_error: dict):
-    failed_transactions.insert_one({**trn_data, "status": "failed", "api_response": api_error})
+    failed_transactions.insert_one({**trn_data, "status": "failed", "api_response": str(api_error)})
 
 def create_credit_transaction(trn_data: dict, api_response: dict):
     fee_id = trn_data.get("fee_id")
@@ -66,12 +66,12 @@ def create_credit_transaction(trn_data: dict, api_response: dict):
     commission = compute_commission(trn_data["amount"], fee)
     trn_data["charge"] = charge
     trn_data["commission"] = commission
-    transactions.insert_one({trn_data | {"status": "successful", "trn_date": datetime.now().isoformat(), "api_response": api_response}})
+    transactions.insert_one({trn_data | {"status": "successful", "trn_date": datetime.now().isoformat(), "api_response": str(api_response)}})
     # update account balance
     accounts.update_one({"account_number": trn_data["account"]}, {"$inc": {"current_balance": trn_data["amount"]}})
 
 def create_debit_transaction(trn_data: dict, api_response: dict):
-    transactions.insert_one({trn_data | {"status": "successful", "trn_date": datetime.now().isoformat(), "api_response": api_response}})
+    transactions.insert_one({trn_data | {"status": "successful", "trn_date": datetime.now().isoformat(), "api_response": str(api_response)}})
     # update account balance
     accounts.update_one({"account_number": trn_data["account"]}, {"$inc": {"current_balance": -trn_data["amount"]}})
 

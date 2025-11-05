@@ -139,18 +139,18 @@ async def handle_fees_message(phone: str, text:str):
         amount = put_amount * 100
         trx_detail = {"Amount": amount,"Reference": f"{generate_trx_ref()}","Telephone": user['data']['phone']}
         currency = f"{user["data"]['currency']}".upper()
+        account = get_school_account(school_code=user['data']['school_code'],
+                                     currency=currency)
         result = await send_payment_async(endpoint_url=endpoint,
                                           pay_type=pType,
                                           request_data=trx_detail,
                                           currency_code=currency,
                                           timeout=20)
-        print("Result MaxiCash: ", result)
         if not result.get("ok"):
             create_failed_transaction(trn_data=user['data'], api_error=result)
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
             raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
-        account = get_school_account(school_code=user['data']['school_code'],
-                                     currency=user['data']['currency'])
+        
         trn_data = {user['data'] | {"account": account}}
         create_credit_transaction(trn_data=trn_data, api_response=result)
     
