@@ -30,6 +30,7 @@ async def webhook(req: Request):
     data = await req.json()
     try:
         raw_data = data["entry"][0]["changes"][0]["value"]
+        print("Facebook Webhook: ", raw_data)
         if not raw_data.get("messages"):
             return
         field_data  = raw_data["messages"][0]
