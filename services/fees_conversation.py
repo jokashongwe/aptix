@@ -129,6 +129,8 @@ async def handle_fees_message(phone: str, text:str):
             pType = 51
         elif text == "52":
             pType = 52
+        else:
+            pType = 1
         print("PayType: ", pType)
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
