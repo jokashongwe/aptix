@@ -163,5 +163,6 @@ async def create_fee(req: Request):
         "price_cdf": data.get("price_cdf"),
         "academic_year": data.get("academic_year"),
         "is_follow_rate": data.get("is_follow"),
+        "created_at": datetime.now().isoformat()
     })
     return {"message": "created!"}
