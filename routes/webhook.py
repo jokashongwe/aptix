@@ -32,6 +32,7 @@ async def webhook(req: Request):
         raw_data = data["entry"][0]["changes"][0]["value"]
         if not raw_data.get("messages"):
             print(f"No Message {raw_data}")
+            return
         field_data  = raw_data["messages"][0]
         
         phone, text = parse_data(field_data)
