@@ -5,7 +5,7 @@ import os
 
 ticket_router = APIRouter()
 
-@ticket_router.post("/busoffers")
+@ticket_router.post("/busoffers", tags=["Ticket Management"])
 async def bus_options_endpoint(req: Request):
     data = await req.json()
     apiSecret = req.headers.get("API-SECRET")
@@ -22,7 +22,7 @@ async def bus_options_endpoint(req: Request):
     })
     return {"status": "bus options received"}
 
-@ticket_router.post("/ariplaneoffers")
+@ticket_router.post("/ariplaneoffers", tags=["Ticket Management"])
 async def airplane_options_endpoint(req: Request):
     data = await req.json()
     apiSecret = req.headers.get("API-SECRET")
@@ -42,7 +42,7 @@ async def airplane_options_endpoint(req: Request):
     })
     return {"status": "airplane offer created"}
 
-@ticket_router.post("/concertoffers")
+@ticket_router.post("/concertoffers",tags=["Ticket Management"])
 async def concert_options_endpoints(req: Request):
     data = await req.json()
     apiSecret = req.headers.get("API-SECRET")

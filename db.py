@@ -8,6 +8,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 client = MongoClient(MONGO_URI)
 db = client["chatbot_whatsapp"]
 users = db["users"]
+appusers = db["app_users"]
 
 ## TICKET BOT COLLECTIONS
 tickets = db["tickets"]

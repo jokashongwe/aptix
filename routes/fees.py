@@ -152,7 +152,7 @@ async def get_account_details(account_number: str):
     return account
 
 
-@fees_router.post("/fees")
+@fees_router.post("/fees", tags=["Fees Management"])
 async def create_fee(req: Request):
     data = await req.json()
     fees.insert_one({
