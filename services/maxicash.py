@@ -5,11 +5,12 @@
 
 import os
 import httpx
-import requests
 from typing import Dict, Any
 
-MERCHANT_ID = os.getenv("MAXICASH_MERCHANT_ID")
-MERCHANT_PASSWORD = os.getenv("MAXICASH_MERCHANT_PASSWORD")
+#load_dotenv()
+
+MERCHANT_ID = os.getenv("MERCHANT_ID")
+MERCHANT_PASSWORD = os.getenv("MERCHANT_PASSWORD")
 
 async def send_payment_async(
     endpoint_url: str,
