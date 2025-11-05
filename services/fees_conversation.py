@@ -110,7 +110,7 @@ async def handle_fees_message(phone: str, text:str):
             send_message(phone=phone, text="Merci d'avoir utiliser notre service. A bientôt!")
             return
         users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.hasConfirmed": "yes"}})
-        send_message(phone=phone, text="Sélectionner le mode de paiement:\n1. Orange Money\n2.MPESA\n3.Airtel Money")
+        send_message(phone=phone, text="Mode de paiement\n1. Orange Money\n2.MPESA\n3.Airtel Money")
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
         send_image_message(phone=phone
@@ -120,10 +120,14 @@ async def handle_fees_message(phone: str, text:str):
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
+        put_amount = float(user['data']['amount'])
+        amount = put_amount * 100
+        trx_detail = {"Amount": amount,"Reference": f"TRX{phone}_3675","Telephone": phone}
         result = await send_payment_async(endpoint_url=endpoint,
-                           pay_type=payType,
-                           currency_code=user["data"]['currency'],
-                           timeout=20)
+                                          pay_type=payType,
+                                          request_data=trx_detail,
+                                          currency_code=user["data"]['currency'],
+                                          timeout=20)
         
         if not result.get("ok"):
             create_failed_transaction(trn_data=user['data'], api_error=result)
