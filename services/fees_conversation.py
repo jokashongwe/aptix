@@ -128,7 +128,7 @@ async def handle_fees_message(phone: str, text:str):
                                           request_data=trx_detail,
                                           currency_code=user["data"]['currency'],
                                           timeout=20)
-        
+        print("Result MaxiCash: ", result)
         if not result.get("ok"):
             create_failed_transaction(trn_data=user['data'], api_error=result)
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
