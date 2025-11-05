@@ -119,7 +119,7 @@ async def handle_fees_message(phone: str, text:str):
         send_image_message(phone=phone
                            , image_url="https://cdn-icons-png.freepik.com/256/10295/10295662.png",
                            caption="Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
-        payType = text 
+        payType = int(text) 
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"

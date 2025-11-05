@@ -23,7 +23,7 @@ async def send_payment_async(
         "RequestData": request_data,
         "MerchantID": MERCHANT_ID,
         "MerchantPassword": MERCHANT_PASSWORD,
-        "PayType": int(pay_type),
+        "PayType": pay_type,
         "CurrencyCode": currency_code.upper()
     }
     print("MaxiCash Payload: ", payload)

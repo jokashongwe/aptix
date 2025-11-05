@@ -53,7 +53,7 @@ def get_school_account(school_code: str, currency: str):
     return accounts.find_one(query, projection)
 
 def create_failed_transaction(trn_data: dict, api_error: dict):
-    transactions.insert_one({**trn_data, "status": "failed", "api_response": api_error})
+    failed_transactions.insert_one({**trn_data, "status": "failed", "api_response": api_error})
 
 def create_credit_transaction(trn_data: dict, api_response: dict):
     fee_id = trn_data.get("fee_id")
