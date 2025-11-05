@@ -100,7 +100,7 @@ async def handle_fees_message(phone: str, text:str):
         users.update_one({"phone": phone}, {"$set": {"step": "payment_method", "data.currency": text}})
         fee = get_fee_title(fee_id=user['data']['fee_id'])
         student = get_student_name(student_id=user['data']['student_id'].upper())
-        send_buttons(phone=phone, body=f"Confirmez-vous le paiement de {fee['title']} d'un montant de {user['data']['amount']} {text} pour l'élève {student} ?", buttons=[
+        send_buttons(phone=phone, body=f"Confirmez-vous le paiement de {fee['title']} d'un montant de {user['data']['amount']} {text} pour l'élève {student['full_name']} ?", buttons=[
                 {"type": "reply", "reply": {"id": "yes", "title": "Oui"}},
                 {"type": "reply", "reply": {"id": "no", "title": "Non"}},
             ])
