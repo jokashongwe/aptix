@@ -127,7 +127,7 @@ async def handle_fees_message(phone: str, text:str):
             pType = 3
         elif text == "51":
             pType = 51
-        else:
+        elif text == "52":
             pType = 52
         print("PayType: ", pType)
         # contact MaxiCash API
