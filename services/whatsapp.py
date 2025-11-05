@@ -16,7 +16,8 @@ def send_message(phone: str, text: str):
         "type": "text",
         "text": {"body": text}
     }
-    requests.post(API_URL, headers=headers, json=data)
+    res = requests.post(API_URL, headers=headers, json=data)
+    print("Res:send_message: ", res)
 
 def send_image_message(phone: str, image_url: str, caption: str = None):
     headers = {
@@ -32,7 +33,8 @@ def send_image_message(phone: str, image_url: str, caption: str = None):
             "caption": caption
         }
     }
-    requests.post(API_URL, headers=headers, json=data)
+    res = requests.post(API_URL, headers=headers, json=data)
+    print("Res:send_image_message: ", res)
 
 def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
     headers = {
@@ -54,6 +56,7 @@ def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
         }
     }
     response = requests.post(API_URL, headers=headers, json=payload)
+    print("Res:send_image_buttons: ", response)
 
 def send_buttons(phone: str, body: str, buttons: list):
     #print("Envoi des boutons")
@@ -79,7 +82,7 @@ def send_buttons(phone: str, body: str, buttons: list):
         }
     }
     response = requests.post(API_URL, headers=headers, json=payload)
-    #print("Response buttons: ", response.json())
+    print("Response buttons: ", response.json())
 
 def send_list_message(phone: str, header: str, body: str, footer: str, sections: list, button_text: str="Voir les options"):
     headers = {
