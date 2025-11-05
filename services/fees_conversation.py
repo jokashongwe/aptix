@@ -109,13 +109,8 @@ async def handle_fees_message(phone: str, text:str):
             users.update_one({"phone": phone}, {"$set": {"step": "start", "data": None}})
             send_message(phone=phone, text="Merci d'avoir utiliser notre service. A bientôt!")
             return
-        users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.hasConfirmed": text}})
-        send_buttons(phone=phone, body=f"Sélectionner le mode de paiement:", buttons=[
-                {"type": "reply", "reply": {"id": "mpesa", "title": "M-PESA"}},
-                {"type": "reply", "reply": {"id": "orangemoney", "title": "Orange Money"}},
-                {"type": "reply", "reply": {"id": "airtelmoney", "title": "Airtel Money"}},
-                {"type": "reply", "reply": {"id": "rakkacash", "title": "RakkaCash"}},
-            ])
+        users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.hasConfirmed": "yes"}})
+        send_message(phone=phone, text="Sélectionner le mode de paiement:\n1. Orange Money\n2.MPESA\n3.Airtel Money")
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
         send_image_message(phone=phone
