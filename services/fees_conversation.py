@@ -79,7 +79,7 @@ async def handle_fees_message(phone: str, text:str):
         print("Fees: ", fees)
         sections = [{
             "title": "List des Frais",
-            "rows": [{"id": f"{fee["fee_id"]}", "title": f"{fee["title"]} {fee["price_cdf"]} Fc ({fee["price_usd"]}$)"} for fee in fees ]
+            "rows": [{"id": f"{fee["fee_id"]}", "title": f"{fee["title"][:23]}" ,"description": f"{fee["title"]} {fee["price_cdf"]} Fc ({fee["price_usd"]}$)" } for fee in fees ]
         }]
         send_list_message(phone=phone,
                            header="Liste des Frais",
