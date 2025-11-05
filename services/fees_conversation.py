@@ -97,20 +97,23 @@ async def handle_fees_message(phone: str, text:str):
                 {"type": "reply", "reply": {"id": "usd", "title": "Dollars américains"}},
             ])
     elif current_step.startswith("confirm"):
-        users.update_one({"phone": phone}, {"$set": {"step": "payment_method", "data.currency": text}})
+        users.update_one({"phone": phone}, {"$set": {"step": "payment_phone", "data.currency": text}})
         fee = get_fee_title(fee_id=user['data']['fee_id'])
         student = get_student_name(student_id=user['data']['student_id'].upper())
         send_buttons(phone=phone, body=f"Confirmez-vous le paiement de {fee['title']} d'un montant de {user['data']['amount']} {text} pour l'élève {student['full_name']} ?", buttons=[
                 {"type": "reply", "reply": {"id": "yes", "title": "Oui"}},
                 {"type": "reply", "reply": {"id": "no", "title": "Non"}},
             ])
-    elif current_step.startswith("payment_method"):
+    elif current_step.startswith("payment_phone"):
         if text == "no":
             users.update_one({"phone": phone}, {"$set": {"step": "start", "data": None}})
             send_message(phone=phone, text="Merci d'avoir utiliser notre service. A bientôt!")
             return
-        users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.hasConfirmed": "yes"}})
-        send_message(phone=phone, text="Mode de paiement\n1. Orange Money\n2.MPESA\n3.Airtel Money")
+        users.update_one({"phone": phone}, {"$set": {"step": "payment_method", "data.hasConfirmed": "yes"}})
+        send_message(phone=phone, text="Quel est le numéro pour le paiement ?")
+    elif current_step.startswith("payment_method"):
+        users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.phone": text}})
+        send_message(phone=phone, text="Sélectionner Mode de paiement\n1.Orange Money\n2.MPESA\n3.Airtel Money")
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
         send_image_message(phone=phone
