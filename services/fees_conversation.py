@@ -123,7 +123,7 @@ async def handle_fees_message(phone: str, text:str):
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
-        put_amount = float(user['data']['amount'])
+        put_amount = int(user['data']['amount'])
         amount = put_amount * 100
         trx_detail = {"Amount": amount,"Reference": f"TRX3675","Telephone": phone}
         result = await send_payment_async(endpoint_url=endpoint,
