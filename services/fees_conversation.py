@@ -5,6 +5,7 @@ from services.fees import *
 from services.maxicash import send_payment_async
 import os
 from fastapi import HTTPException
+import random
 
 acad_year = os.getenv("SCHOOL_YEAR", "2025-2026")
 
@@ -117,19 +118,29 @@ async def handle_fees_message(phone: str, text:str):
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
         send_image_message(phone=phone
-                           , image_url="https://cdn-icons-png.freepik.com/256/10295/10295662.png",
+                           , image_url="https://cdn-icons-png.freepik.com/256/18327/18327199.png",
                            caption="Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
-        payType = int(text) 
+        pType = 1
+        if text == "2":
+            pType = 2
+        elif text == "3":
+            pType = 3
+        elif text == "51":
+            pType = 51
+        else:
+            pType = 52
+        print("PayType: ", pType)
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
         put_amount = int(user['data']['amount'])
         amount = put_amount * 100
-        trx_detail = {"Amount": amount,"Reference": f"TRX3675","Telephone": user['data']['phone']}
+        trx_detail = {"Amount": amount,"Reference": f"{generate_trx_ref()}","Telephone": user['data']['phone']}
+        currency = f"{user["data"]['currency']}".upper()
         result = await send_payment_async(endpoint_url=endpoint,
-                                          pay_type=payType,
+                                          pay_type=pType,
                                           request_data=trx_detail,
-                                          currency_code=user["data"]['currency'],
+                                          currency_code=currency,
                                           timeout=20)
         print("Result MaxiCash: ", result)
         if not result.get("ok"):
@@ -145,7 +156,10 @@ async def handle_fees_message(phone: str, text:str):
 
         # END CALL MAXICASH
         
-
+def generate_trx_ref():
+    random.seed(1656534)
+    randInt =random.randint(135442, 989999)
+    return f"TR{randInt}"
 
 
 #0510
