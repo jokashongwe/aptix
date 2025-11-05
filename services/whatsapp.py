@@ -16,6 +16,7 @@ def send_message(phone: str, text: str):
         "type": "text",
         "text": {"body": text}
     }
+    print("FB:SM:Payload: ", data)
     res = requests.post(API_URL, headers=headers, json=data)
     print("Res:send_message: ", res)
 
@@ -33,6 +34,7 @@ def send_image_message(phone: str, image_url: str, caption: str = None):
             "caption": caption
         }
     }
+    print("FB:IM:Payload: ", data)
     res = requests.post(API_URL, headers=headers, json=data)
     print("Res:send_image_message: ", res)
 
@@ -55,6 +57,7 @@ def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
             "action": {"buttons": buttons}
         }
     }
+    print("FB:IB:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
     print("Res:send_image_buttons: ", response)
 
@@ -81,6 +84,7 @@ def send_buttons(phone: str, body: str, buttons: list):
             "action": {"buttons": buttons}
         }
     }
+    print("FB:SB:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
     print("Response buttons: ", response.json())
 
@@ -104,6 +108,7 @@ def send_list_message(phone: str, header: str, body: str, footer: str, sections:
             }
         }
     }
+    print("FB:LM:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
     print("Response list message: ", response.json())
 
