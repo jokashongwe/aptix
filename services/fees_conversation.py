@@ -117,9 +117,6 @@ async def handle_fees_message(phone: str, text:str):
         send_message(phone=phone, text="Sélectionner Mode de paiement\n1.Orange Money\n2.MPESA\n3.Airtel Money")
     elif current_step.startswith("wait_for_payment"):
         users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
-        send_image_message(phone=phone
-                           , image_url="https://cdn-icons-png.freepik.com/256/18327/18327199.png",
-                           caption="Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
         pType = 1
         if text == "2":
             pType = 2
@@ -131,7 +128,6 @@ async def handle_fees_message(phone: str, text:str):
             pType = 52
         else:
             pType = 1
-        print("PayType: ", pType)
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
@@ -146,15 +142,23 @@ async def handle_fees_message(phone: str, text:str):
                                           request_data=trx_detail,
                                           currency_code=currency,
                                           timeout=20)
+        response = result.get("response")
         if not result.get("ok"):
             create_failed_transaction(trn_data=user['data'], api_error=result)
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
             raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         
+        if response and response.get("ResponseStatus"):
+            status = response.get("ResponseStatus", "Unknown")
+            if status == "Failed":
+                create_failed_transaction(trn_data=user['data'], api_error=result)
+                send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
+                raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         trn_data = {user['data'] | {"account": account}}
         create_credit_transaction(trn_data=trn_data, api_response=result)
-    
-    print("User Data: ", user['data'])
+        send_image_message(phone=phone
+                           , image_url="https://cdn-icons-png.freepik.com/256/18327/18327199.png",
+                           caption="🟩Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
 
         # END CALL MAXICASH
         
