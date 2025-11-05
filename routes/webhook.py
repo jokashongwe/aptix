@@ -29,7 +29,10 @@ async def verify(request: Request):
 async def webhook(req: Request):
     data = await req.json()
     try:
-        field_data  = data["entry"][0]["changes"][0]["value"]["messages"][0]
+        raw_data = data["entry"][0]["changes"][0]["value"]
+        if not raw_data.get("messages"):
+            print(f"No Message {raw_data}")
+        field_data  = raw_data["messages"][0]
         
         phone, text = parse_data(field_data)
         if CHAT_OPTION == "TICKET":
