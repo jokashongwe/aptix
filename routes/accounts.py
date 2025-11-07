@@ -38,17 +38,17 @@ async def get_dashboard():
     failed_transactions = await failed_transactions.count_documents({})
 
     # --- Total Credits ---
-    total_credits_result = await transactions.aggregate([
+    total_credits_result = list(transactions.aggregate([
         {"$match": {"type": "credit"}},
         {"$group": {"_id": None, "total_credits": {"$sum": "$amount"}}}
-    ]).to_list(1)
+    ]))
     total_credits = total_credits_result[0]["total_credits"] if total_credits_result else 0
 
     # --- Total Debits ---
-    total_debits_result = await transactions.aggregate([
+    total_debits_result = list(transactions.aggregate([
         {"$match": {"type": "debit"}},
         {"$group": {"_id": None, "total_debits": {"$sum": "$amount"}}}
-    ]).to_list(1)
+    ]))
     total_debits = total_debits_result[0]["total_debits"] if total_debits_result else 0
 
     return {
