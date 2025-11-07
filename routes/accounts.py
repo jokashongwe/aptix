@@ -35,7 +35,7 @@ async def get_dashboard():
     active_schools = schools.count_documents({"status": "active"})
 
     # --- Total Failed Transactions ---
-    failed_transactions =  failed_transactions.count_documents({})
+    failed_trx =  failed_transactions.count_documents({})
 
     # --- Total Credits ---
     total_credits_result = list(transactions.aggregate([
@@ -54,7 +54,7 @@ async def get_dashboard():
     return {
         "total_balance": total_balance,
         "active_customers": active_schools,
-        "total_failed_transactions": failed_transactions,
+        "total_failed_transactions": failed_trx,
         "total_credits": total_credits,
         "total_debits": total_debits
     }
