@@ -149,8 +149,9 @@ async def handle_fees_message(phone: str, text:str):
             raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         
         if response and response.get("ResponseStatus"):
-            status = response.get("ResponseStatus", "Unknown")
-            if status == "Failed":
+            status = f"{response.get("ResponseStatus", "Unknown")}"
+            
+            if "failed" in status.lower():
                 create_failed_transaction(trn_data=user['data'], api_error=result)
                 send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
                 raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
