@@ -132,7 +132,8 @@ async def get_schools(
         "code": 1,
         "address":1,
         "logo_url": 1,
-        "created_at": 1
+        "created_at": 1,
+        "active": 1
     }
     account_list = list(schools.find({}, projection))
     return  {
