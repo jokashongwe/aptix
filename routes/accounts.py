@@ -32,10 +32,10 @@ async def get_dashboard():
     total_balance = balance_result[0]["total_balance"] if balance_result else 0
 
     # --- Active Customers ---
-    active_schools = await schools.count_documents({"status": "active"})
+    active_schools = schools.count_documents({"status": "active"})
 
     # --- Total Failed Transactions ---
-    failed_transactions = await failed_transactions.count_documents({})
+    failed_transactions =  failed_transactions.count_documents({})
 
     # --- Total Credits ---
     total_credits_result = list(transactions.aggregate([
