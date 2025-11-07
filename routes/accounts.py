@@ -136,5 +136,5 @@ async def get_accounts(
     }
     account_list = list(schools.find({}, projection))
     return  {
-        "schools": schools
+        "schools": account_list
     }
