@@ -8,6 +8,7 @@ from schema.auth import AppUserInDB, AppUser, TokenData
 from db import appusers
 from typing import Annotated
 import os
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -16,6 +17,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+security = HTTPBearer()
 
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
