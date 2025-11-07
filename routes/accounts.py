@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, APIRouter
 from db import accounts, transactions, schools, failed_transactions
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from schema.auth import AppUser
+from schema.auth import AppUser, AppUserInDB
 from typing import Annotated, List
 from services.auth import get_current_active_user, get_current_user
 
@@ -11,7 +11,7 @@ account_router = APIRouter()
 
 @account_router.get("/accounts", tags=["Account Management"])
 async def get_accounts(
-    token:str = Depends(get_current_user),
+    current_user: Annotated[AppUserInDB, Depends(get_current_user)]
 ):
     projection = {
         "_id": 0,
@@ -27,7 +27,7 @@ async def get_accounts(
     }
 
 @account_router.get("/accounts/summary", tags=["Account Management"])
-async def get_dashboard(token:str = Depends(get_current_user),):
+async def get_dashboard(current_user: Annotated[AppUserInDB, Depends(get_current_user)]):
     # --- Total Balance ---
     balance_result = list(accounts.aggregate([
         {"$group": {"_id": None, "total_balance": {"$sum": "$current_balance"}}}
@@ -65,7 +65,7 @@ async def get_dashboard(token:str = Depends(get_current_user),):
 @account_router.get("/accounts/{account_number}", tags=["Account Management"])
 async def account_detail(
     account_number: str,
-    token:str = Depends(get_current_user),
+    current_user: Annotated[AppUserInDB, Depends(get_current_user)]
 ):
     projection = {
         "_id": 0,
@@ -83,7 +83,7 @@ async def account_detail(
 @account_router.get("/accounts/{account_number}/transactions", tags=["Account Management"])
 async def get_accounts(
     account_number: str,
-    token:str = Depends(get_current_user),
+    current_user: Annotated[AppUserInDB, Depends(get_current_user)]
 ):
     projection = {
         "_id": 0,
@@ -104,7 +104,7 @@ async def get_accounts(
 @account_router.get("/transactions/{tran_id}", tags=["Account Management"])
 async def account_detail(
     tran_id: str,
-    token:str = Depends(get_current_user),
+    user:AppUserInDB = Annotated[AppUserInDB, Depends(get_current_user)]
 ):
     projection = {
         "_id": 0,
