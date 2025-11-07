@@ -140,7 +140,7 @@ async def get_schools(
     }
 
 @account_router.get("/schools/{code}/accounts", tags=["Account Management"])
-async def get_schools(
+async def get_schools_accounts(
     code: str,
     current_user: Annotated[AppUserInDB, Depends(get_current_user)]
 ):
