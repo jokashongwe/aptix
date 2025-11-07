@@ -123,7 +123,7 @@ async def account_detail(
     }
 
 @account_router.get("/schools", tags=["Account Management"])
-async def get_accounts(
+async def get_schools(
     current_user: Annotated[AppUserInDB, Depends(get_current_user)]
 ):
     projection = {
