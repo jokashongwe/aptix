@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, APIRouter
-from db import accounts, transactions
+from db import accounts, transactions, schools, failed_transactions
 from schema.auth import AppUser
 from typing import Annotated, List
 from services.auth import get_current_active_user
@@ -21,6 +21,42 @@ async def get_accounts(
     account_list = list(accounts.find({}, projection))
     return  {
         "accounts": account_list
+    }
+
+@account_router.get("/accounts/summary", tags=["Account Management"])
+async def get_dashboard():
+    # --- Total Balance ---
+    balance_result = await accounts.aggregate([
+        {"$group": {"_id": None, "total_balance": {"$sum": "$current_balance"}}}
+    ]).to_list(1)
+    total_balance = balance_result[0]["total_balance"] if balance_result else 0
+
+    # --- Active Customers ---
+    active_schools = await schools.count_documents({"status": "active"})
+
+    # --- Total Failed Transactions ---
+    failed_transactions = await failed_transactions.count_documents({})
+
+    # --- Total Credits ---
+    total_credits_result = await transactions.aggregate([
+        {"$match": {"type": "credit"}},
+        {"$group": {"_id": None, "total_credits": {"$sum": "$amount"}}}
+    ]).to_list(1)
+    total_credits = total_credits_result[0]["total_credits"] if total_credits_result else 0
+
+    # --- Total Debits ---
+    total_debits_result = await transactions.aggregate([
+        {"$match": {"type": "debit"}},
+        {"$group": {"_id": None, "total_debits": {"$sum": "$amount"}}}
+    ]).to_list(1)
+    total_debits = total_debits_result[0]["total_debits"] if total_debits_result else 0
+
+    return {
+        "total_balance": total_balance,
+        "active_customers": active_schools,
+        "total_failed_transactions": failed_transactions,
+        "total_credits": total_credits,
+        "total_debits": total_debits
     }
 
 @account_router.get("/accounts/{account_number}", tags=["Account Management"])
