@@ -122,5 +122,19 @@ async def account_detail(
         "transaction": transaction
     }
 
-
-
+@account_router.get("/schools", tags=["Account Management"])
+async def get_accounts(
+    current_user: Annotated[AppUserInDB, Depends(get_current_user)]
+):
+    projection = {
+        "_id": 0,
+        "title": 1,
+        "code": 1,
+        "address":1,
+        "logo_url": 1,
+        "created_at": 1
+    }
+    account_list = list(schools.find({}, projection))
+    return  {
+        "schools": schools
+    }
