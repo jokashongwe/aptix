@@ -4,10 +4,25 @@ import os
 import logging
 from dotenv import load_dotenv
 from routes import ticket_router, webhook_router, fees_router, auth_router, account_router
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
 app = FastAPI()
+
+origins = [
+    "https://aptix.afrimetrik.com",
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(webhook_router)
 app.include_router(auth_router, prefix="/auth")
