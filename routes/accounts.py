@@ -1,9 +1,8 @@
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, APIRouter
 from db import accounts, transactions, schools, failed_transactions
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from schema.auth import AppUser, AppUserInDB
-from typing import Annotated, List
-from services.auth import get_current_active_user, get_current_user
+from schema.auth import AppUserInDB
+from typing import Annotated
+from services.auth import get_current_user
 
 account_router = APIRouter()
 
@@ -138,4 +137,22 @@ async def get_schools(
     account_list = list(schools.find({}, projection))
     return  {
         "schools": account_list
+    }
+
+@account_router.get("/schools/{code}/accounts", tags=["Account Management"])
+async def get_schools(
+    code: str,
+    current_user: Annotated[AppUserInDB, Depends(get_current_user)]
+):
+    projection = {
+        "_id": 0,
+        "account_number": 1,
+        "title": 1,
+        "current_balance":1,
+        "currency": 1,
+        "school_code": 1
+    }
+    account_list = list(accounts.find({"school_code": code}, projection))
+    return  {
+        "accounts": account_list
     }
