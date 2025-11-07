@@ -26,9 +26,9 @@ async def get_accounts(
 @account_router.get("/accounts/summary", tags=["Account Management"])
 async def get_dashboard():
     # --- Total Balance ---
-    balance_result = await accounts.aggregate([
+    balance_result = list(accounts.aggregate([
         {"$group": {"_id": None, "total_balance": {"$sum": "$current_balance"}}}
-    ]).to_list(1)
+    ]))
     total_balance = balance_result[0]["total_balance"] if balance_result else 0
 
     # --- Active Customers ---
