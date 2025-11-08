@@ -55,6 +55,7 @@ async def handle_fees_message(phone: str, text:str):
             students = search_by_fullname(fullname=text.upper(), school_year=acad_year)
             field_type = "nom"
         if not students or len(students) == 0:
+            users.update_one({"phone": phone}, {"$set": {"step": "search"}})
             send_buttons(phone=phone, body=f"Nous n'avons trouvé aucune correspondance pour ce {field_type}.\nSouhaitez-vous reprendre la recherche par matricule ou par nom ?", buttons=[
                 {"type": "reply", "reply": {"id": "select_student_mat", "title": "Matricule"}},
                 {"type": "reply", "reply": {"id": "select_student_name", "title": "Nom de l'élève"}},
