@@ -118,7 +118,7 @@ async def handle_fees_message(phone: str, text:str):
         parsedPhone = text
         payType = None
         phone_code = parsedPhone[:2]
-        # print("Phone Code: ", phone_code)
+        print("Phone Code: ", phone_code)
         if phone_code in ['81', '82', '83']:
             payType = 2
         elif phone_code in ['84', '85', '89']:
@@ -130,7 +130,7 @@ async def handle_fees_message(phone: str, text:str):
         
         if not payType:
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
-            raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
+            raise HTTPException(status_code=502, detail="Payment provider error")
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
