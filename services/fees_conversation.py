@@ -115,7 +115,7 @@ async def handle_fees_message(phone: str, text:str):
         send_message(phone=phone, text="Quel est le numéro pour le paiement ?")
     elif current_step.startswith("payment_method"):
         users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.phone": text}})
-        parsedPhone = phone[-9:]
+        parsedPhone = text
         payType = None
         phone_code = parsedPhone[:2]
         print("Phone Code: ", phone_code)
@@ -136,7 +136,7 @@ async def handle_fees_message(phone: str, text:str):
         endpoint = f"{endpoint}/Integration/PayNowSync"
         put_amount = int(user['data']['amount'])
         amount = put_amount * 100
-        trx_detail = {"Amount": amount,"Reference": f"{generate_trx_ref()}","Telephone": user['data']['phone']}
+        trx_detail = {"Amount": amount,"Reference": f"{generate_trx_ref()}","Telephone": text}
         currency = f"{user["data"]['currency']}".upper()
         account = get_school_account(school_code=user['data']['school_code'],
                                      currency=currency)
