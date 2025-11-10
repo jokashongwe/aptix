@@ -146,21 +146,21 @@ async def handle_fees_message(phone: str, text:str):
                                           request_data=trx_detail,
                                           currency_code=currency,
                                           timeout=20)
-        response = result.get("response")
+        response = result.get("ResponseStatus")
+        print("MaxiCash Reponse: ", result)
         if not result.get("ok"):
             users.update_one({"phone": phone}, {"$set": {"step": "start"}})
             create_failed_transaction(trn_data=user['data'], api_error=result)
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
             raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         
-        if response and response.get("ResponseStatus"):
-            status = f"{response.get("ResponseStatus", "failed")}"
-            if "failed" in status.lower():
-                users.update_one({"phone": phone}, {"$set": {"step": "start"}})
-                create_failed_transaction(trn_data=user['data'], api_error=result)
-                send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
-                raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
+        if "failed" in response.lower():
+            users.update_one({"phone": phone}, {"$set": {"step": "start"}})
+            create_failed_transaction(trn_data=user['data'], api_error=result)
+            send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
+            raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         trn_data = {user['data'] | {"account": account}}
+        trn_data["academic_year"] = os.getenv("ACADEMIC_YEAR", "2025-2026")
         create_credit_transaction(trn_data=trn_data, api_response=result)
         send_image_message(phone=phone
                            , image_url="https://cdn-icons-png.freepik.com/256/18327/18327199.png",

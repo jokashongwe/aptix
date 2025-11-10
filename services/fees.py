@@ -34,17 +34,21 @@ def search_by_fullname(fullname: str, school_year: str):
     return list(students.find({"fullname": {"$regex": pattern}, "academic_year": school_year}, projection))
 
 def compute_charge(amount: float, charge_config: dict):
+    amt = float(amount)
+    c_value = float(charge_config["value"])
     if charge_config["charge_type"] == "percentage":
-        charge = (charge_config["value"] / 100) * amount
+        charge = (c_value / 100) * amt
     else:
-        charge = charge_config["value"]
+        charge = c_value
     return charge
 
 def compute_commission(amount: float, commission_config: dict):
+    amt = float(amount)
+    c_value = float(commission_config["commission_value"])
     if commission_config["commission_type"] == "percentage":
-        commission = (commission_config["commission_value"] / 100) * amount
+        commission = (c_value / 100) * amt
     else:
-        commission = commission_config["commission_value"]
+        commission = c_value
     return commission
 
 def get_school_account(school_code: str, currency: str):
