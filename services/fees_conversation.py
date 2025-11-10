@@ -117,13 +117,15 @@ async def handle_fees_message(phone: str, text:str):
         users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.phone": text}})
         parsedPhone = phone[-9:]
         payType = None
-        if parsedPhone[:2] in ['81', '82', '83']:
+        phone_code = parsedPhone[:2]
+        print("Phone Code: ", phone_code)
+        if phone_code in ['81', '82', '83']:
             payType = 2
-        elif parsedPhone[:2] in ['84', '85', '89']:
+        elif phone_code in ['84', '85', '89']:
             payType = 3
-        elif parsedPhone[:2] in ['99', '98', '97']:
+        elif phone_code in ['99', '98', '97']:
             payType = 1
-        elif parsedPhone[:2] in ['90', '91', '92']:
+        elif phone_code in ['90', '91', '92']:
             payType = 52
         
         if not payType:
