@@ -30,7 +30,7 @@ async def webhook(req: Request):
     data = await req.json()
     try:
         raw_data = data["entry"][0]["changes"][0]["value"]
-        print("Facebook Webhook: ", raw_data)
+        #print("Facebook Webhook: ", raw_data)
         if not raw_data.get("messages"):
             return
         field_data  = raw_data["messages"][0]
@@ -39,7 +39,7 @@ async def webhook(req: Request):
         if CHAT_OPTION == "TICKET":
             handle_message(phone, text)
         else: 
-            print(f"Field Data: {field_data}")
+            #print(f"Field Data: {field_data}")
             await handle_fees_message(phone, text)
     except Exception as e:
         print("Erreur webhook: ", e)

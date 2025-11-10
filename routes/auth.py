@@ -18,7 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    print("FormData:", form_data)
+    #print("FormData:", form_data)
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
