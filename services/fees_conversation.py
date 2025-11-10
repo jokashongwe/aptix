@@ -115,20 +115,20 @@ async def handle_fees_message(phone: str, text:str):
         send_message(phone=phone, text="Quel est le numéro pour le paiement ?")
     elif current_step.startswith("payment_method"):
         users.update_one({"phone": phone}, {"$set": {"step": "wait_for_payment", "data.phone": text}})
-        send_message(phone=phone, text="Sélectionner Mode de paiement\n1.Orange Money\n2.MPESA\n3.Airtel Money")
-    elif current_step.startswith("wait_for_payment"):
-        users.update_one({"phone": phone}, {"$set": {"step": "start", "data.paymentmethod": text}})
-        pType = 1
-        if text == "2":
-            pType = 2
-        elif text == "3":
-            pType = 3
-        elif text == "51":
-            pType = 51
-        elif text == "52":
-            pType = 52
-        else:
-            pType = 1
+        parsedPhone = phone[-9:]
+        payType = None
+        if parsedPhone[:2] in ['81', '82', '83']:
+            payType = 2
+        elif parsedPhone[:2] in ['84', '85', '89']:
+            payType = 3
+        elif parsedPhone[:2] in ['99', '98', '97']:
+            payType = 1
+        elif parsedPhone[:2] in ['90', '91', '92']:
+            payType = 52
+        
+        if not payType:
+            send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
+            raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         # contact MaxiCash API
         endpoint = os.getenv('MAXICASH_API_URL', '"https://webapi-test.maxicashapp.com')
         endpoint = f"{endpoint}/Integration/PayNowSync"
@@ -139,20 +139,21 @@ async def handle_fees_message(phone: str, text:str):
         account = get_school_account(school_code=user['data']['school_code'],
                                      currency=currency)
         result = await send_payment_async(endpoint_url=endpoint,
-                                          pay_type=pType,
+                                          pay_type=payType,
                                           request_data=trx_detail,
                                           currency_code=currency,
                                           timeout=20)
         response = result.get("response")
         if not result.get("ok"):
+            users.update_one({"phone": phone}, {"$set": {"step": "start"}})
             create_failed_transaction(trn_data=user['data'], api_error=result)
             send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
             raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
         
         if response and response.get("ResponseStatus"):
             status = f"{response.get("ResponseStatus", "failed")}"
-            
             if "failed" in status.lower():
+                users.update_one({"phone": phone}, {"$set": {"step": "start"}})
                 create_failed_transaction(trn_data=user['data'], api_error=result)
                 send_message(phone=phone, text="Nous rencontrons actuellement un soucis avec notre système.\nVeuillez réessayer plus tard")
                 raise HTTPException(status_code=502, detail=result.get("error") or "Payment provider error")
@@ -161,7 +162,7 @@ async def handle_fees_message(phone: str, text:str):
         send_image_message(phone=phone
                            , image_url="https://cdn-icons-png.freepik.com/256/18327/18327199.png",
                            caption="🟩Votre demande est en cours de traitement.Veuillez confirmer la transactions SVP.\nUne fois fait vous recevrez votre borderau de paiment")
-
+        users.update_one({"phone": phone}, {"$set": {"step": "start"}})
         # END CALL MAXICASH
         
 def generate_trx_ref():
