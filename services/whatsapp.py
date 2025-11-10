@@ -16,9 +16,9 @@ def send_message(phone: str, text: str):
         "type": "text",
         "text": {"body": text}
     }
-    print("FB:SM:Payload: ", data)
+    #print("FB:SM:Payload: ", data)
     res = requests.post(API_URL, headers=headers, json=data)
-    print("Res:send_message: ", res.json())
+    #print("Res:send_message: ", res.json())
 
 def send_image_message(phone: str, image_url: str, caption: str = None):
     headers = {
@@ -34,9 +34,9 @@ def send_image_message(phone: str, image_url: str, caption: str = None):
             "caption": caption
         }
     }
-    print("FB:IM:Payload: ", data)
+    #print("FB:IM:Payload: ", data)
     res = requests.post(API_URL, headers=headers, json=data)
-    print("Res:send_image_message: ", res.json())
+    #print("Res:send_image_message: ", res.json())
 
 def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
     headers = {
@@ -57,9 +57,9 @@ def send_image_buttons(phone: str, image_url: str, body: str, buttons: list):
             "action": {"buttons": buttons}
         }
     }
-    print("FB:IB:Payload: ", payload)
+    # print("FB:IB:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
-    print("Res:send_image_buttons: ", response.json())
+    # print("Res:send_image_buttons: ", response.json())
 
 def send_buttons(phone: str, body: str, buttons: list):
     #print("Envoi des boutons")
@@ -84,9 +84,9 @@ def send_buttons(phone: str, body: str, buttons: list):
             "action": {"buttons": buttons}
         }
     }
-    print("FB:SB:Payload: ", payload)
+    #print("FB:SB:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
-    print("Response buttons: ", response.json())
+    #print("Response buttons: ", response.json())
 
 def send_list_message(phone: str, header: str, body: str, footer: str, sections: list, button_text: str="Voir les options"):
     headers = {
@@ -108,12 +108,12 @@ def send_list_message(phone: str, header: str, body: str, footer: str, sections:
             }
         }
     }
-    print("FB:LM:Payload: ", payload)
+    # print("FB:LM:Payload: ", payload)
     response = requests.post(API_URL, headers=headers, json=payload)
-    print("Response list message: ", response.json())
+    # print("Response list message: ", response.json())
 
 def send_concert_catalog(phone, catalog: str):
-    print("Envoi du catalogue des concerts: ", catalog)
+    #print("Envoi du catalogue des concerts: ", catalog)
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
@@ -147,4 +147,4 @@ def send_concert_catalog(phone, catalog: str):
     }
 
     response = requests.post(url, headers=headers, json=payload)
-    print(response.json())
+    #print(response.json())
